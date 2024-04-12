@@ -29,12 +29,8 @@ class EthereumMiddleware:
 
 # wait_for_transaction_receipt
 # to_bytes
-
     def register_data(self, data_hash, filename, file_cid, size, account):
         try:
-            # Convert the data hash to bytes32
-            data_hash_bytes = bytes.fromhex(data_hash.encode().hex())
-
             # Ensure filename and file_cid are strings
             filename = str(filename)
             file_cid = str(file_cid)
@@ -44,7 +40,7 @@ class EthereumMiddleware:
 
             # Call the register function with the correct types
             tx_hash = self.contract.functions.register(
-                data_hash_bytes, filename, file_cid, size
+                data_hash, filename, file_cid, size  # Use data_hash directly as bytes
             ).transact({'from': account})
 
             # Wait for transaction receipt
