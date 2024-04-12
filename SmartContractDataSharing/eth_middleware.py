@@ -32,12 +32,8 @@ class EthereumMiddleware:
 
     def register_data(self, data_hash, filename, file_cid, size, account):
         try:
-            # Check if the data hash is a valid hexadecimal string
-            if not Web3.isHex(data_hash):
-                raise ValueError("Data hash is not a valid hexadecimal string.")
-
             # Convert the data hash to bytes32
-            data_hash_bytes = Web3.to_bytes(hexstr=data_hash)
+            data_hash_bytes = Web3.to_bytes(hexstr=hex(data_hash))
 
             # Invoke the register function on the contract
             tx_hash = self.contract.functions.register(
