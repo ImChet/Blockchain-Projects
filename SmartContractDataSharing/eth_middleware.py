@@ -34,15 +34,14 @@ class EthereumMiddleware:
     def register_data(self, data_hash, filename, file_cid, size, account):
         # Decode Base58 string to bytes
         try:
-            data_hash_bytes = base58.b58decode(data_hash)
+            data_hash_bytes_full = base58.b58decode(data_hash)
+            # Take only the hash part, excluding the first two metadata bytes
+            data_hash_bytes = data_hash_bytes_full[2:34]
         except ValueError as e:
             raise ValueError(f"Invalid Base58 value: {data_hash}") from e
 
         # Ensure the decoded bytes are 32 bytes in length
-        print(f'data_hash_bytes: {data_hash_bytes}')
-        print(f'len(data_hash_bytes): {len(data_hash_bytes)}')
         if len(data_hash_bytes) != 32:
-            # You may need to adjust this depending on your exact requirements
             raise ValueError("The decoded data hash must be exactly 32 bytes in length.")
 
         # Continue with the smart contract interaction using the bytes
