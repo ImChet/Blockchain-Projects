@@ -35,7 +35,7 @@ def download_from_gateway(file_hash):
         
         # If no filename is found in the Content-Disposition header, use a default one
         if not filename:
-            filename = f'downloaded_{file_hash}'
+            filename = f'dl_{file_hash}'
         
         # Save the downloaded content to a file with the extracted filename
         with open(filename, 'wb') as f:
