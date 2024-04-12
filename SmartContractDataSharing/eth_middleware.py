@@ -12,7 +12,7 @@ class EthereumMiddleware:
         contract_address = os.getenv('CONTRACT_ADDRESS')
         if not contract_address:
             raise EnvironmentError('CONTRACT_ADDRESS environment variable not set.')
-        self.contract_address = Web3.toChecksumAddress(contract_address)
+        self.contract_address = Web3.to_checksum_address(contract_address)
         
         # Load the ABI from the contract JSON file
         with open('build/contracts/DataToken.json', 'r') as abi_file:
