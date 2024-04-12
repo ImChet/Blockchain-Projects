@@ -6,12 +6,13 @@ import hashlib
 import json
 
 app = Flask(__name__)
-middleware = IPFSMiddleware('http://localhost:5001')
+middleware = IPFSMiddleware('http://localhost:5001')  # Initialize middleware with IPFS API URL
 
 # Helper function to generate hash of file metadata
 def generate_metadata_hash(metadata):
-    metadata_string = json.dumps(metadata, sort_keys=True)
-    return hashlib.sha256(metadata_string.encode()).hexdigest()
+    # Prepare the data for hashing
+    data_string = f"{metadata['Size']}{metadata['Name']}{metadata['Hash']}"
+    return hashlib.sha256(data_string.encode()).hexdigest()
 
 # Endpoint to handle file uploads
 @app.route('/upload', methods=['POST'])
@@ -23,16 +24,23 @@ def upload_file_to_ipfs():
         abort(400, 'No selected file')
     filename = secure_filename(file.filename)
     response = middleware.upload_file(file)  # Upload the file via middleware
-    response['filename'] = filename  # Include sanitized filename in response
-    response['hash'] = generate_metadata_hash(response)  # Add hash of metadata to response
-    return jsonify(response), 200  # Return the JSON response from IPFS
+    # Create a receipt with the required information
+    receipt = {
+        'size': response['Size'],
+        'filename': filename,
+        'public': response['Hash'],
+        'hash': generate_metadata_hash(response)
+    }
+    return jsonify(receipt), 200  # Return the receipt as JSON
 
+# Endpoint to handle file downloads
 @app.route('/download/<string:file_hash>', methods=['GET'])
 def download_file_from_ipfs(file_hash):
     download_path = f'/tmp/{file_hash}'
+    # Assume filename is stored or can be retrieved; here just appending 'dl_' prefix
+    filename = f'dl_{file_hash}'
     if middleware.download_file(file_hash, download_path):
-        # Update this line to use 'download_name' instead of 'attachment_filename'
-        return send_file(download_path, as_attachment=True, download_name=f'dl_{file_hash}')
+        return send_file(download_path, as_attachment=True, download_name=filename)
     else:
         abort(404, 'File not found')
 
