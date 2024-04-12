@@ -1,5 +1,26 @@
 import requests
-from requests.utils import requote_uri
+from web3 import Web3
+
+# Configuration
+GATEWAY_URL = "http://127.0.0.1:8080"
+
+# Connect to Ganache and get accounts
+web3 = Web3(Web3.HTTPProvider("http://127.0.0.1:8545"))
+accounts = web3.eth.accounts
+
+# Use the first account as the default account for this example
+default_account = accounts[0]
+print(f"Using the first account from Ganache: {default_account}")
+
+def handle_response(response):
+    if response.ok:
+        try:
+            response_json = response.json()
+            print(f"Response: {response_json}")
+        except ValueError:
+            print(f"Failed to decode JSON. Status Code: {response.status_code}, Response Text: {response.text}")
+    else:
+        print(f"Request failed. Status Code: {response.status_code}, Response Text: {response.text}")
 
 # Uploads a file to the Flask server via HTTP POST
 def upload_to_gateway(file_path):
@@ -46,8 +67,46 @@ def download_from_gateway(file_hash):
         # Handle download errors
         print('Download failed')
 
-# Example usage of the client functions
-upload_response = upload_to_gateway('/practical/file.txt')  # Replace '/practical/file.txt' with your file path
-if upload_response:
-    file_hash = upload_response['public']
-    download_from_gateway(file_hash)
+
+def register_data_on_gateway(data_hash, filename, file_cid, size):
+    data = {
+        'data_hash': data_hash,
+        'filename': filename,
+        'file_cid': file_cid,
+        'size': size,
+        'account': default_account
+    }
+    response = requests.post(f"{GATEWAY_URL}/register_data", json=data)
+    handle_response(response)
+
+def transfer_data_on_gateway(data_hash, to_address):
+    data = {
+        'data_hash': data_hash,
+        'from_address': default_account,
+        'to_address': to_address
+    }
+    response = requests.post(f"{GATEWAY_URL}/transfer_data", json=data)
+    handle_response(response)
+
+def burn_data_on_gateway(data_hash):
+    data = {
+        'data_hash': data_hash,
+        'from_address': default_account
+    }
+    response = requests.post(f"{GATEWAY_URL}/burn_data", json=data)
+    handle_response(response)
+
+def query_tracker_on_gateway(data_hash):
+    response = requests.get(f"{GATEWAY_URL}/query_tracker", params={'data_hash': data_hash})
+    handle_response(response)
+
+# Example usage
+if __name__ == "__main__":
+    upload_response = upload_to_gateway('/practical/file.txt')
+    if upload_response:
+        file_hash = upload_response['public']
+        register_data_on_gateway(file_hash, upload_response['filename'], file_hash, upload_response['size'])
+        transfer_data_on_gateway(file_hash, '0xRecipientAddress')
+        burn_data_on_gateway(file_hash)
+        query_tracker_on_gateway(file_hash)
+        download_from_gateway(file_hash)
