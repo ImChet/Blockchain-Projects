@@ -31,6 +31,7 @@ class EthereumMiddleware:
 
     def register_data(self, data_hash, filename, file_cid, size, account):
             # Remove '0x' prefix and convert to bytes
+            print(f'data_hash: {data_hash}')
             if data_hash.startswith('0x'):
                 data_hash_bytes = bytes.fromhex(data_hash[2:])
             else:
