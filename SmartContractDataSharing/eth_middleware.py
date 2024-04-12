@@ -8,7 +8,7 @@ class EthereumMiddleware:
         if not self.web3.is_connected():
             raise ConnectionError("Unable to connect to the Ethereum node.")
 
-        self.contract_address = contract_address
+        self.contract_address = Web3.to_checksum_address(contract_address)
         
         # Load the ABI from the contract JSON file
         with open('build/contracts/DataToken.json', 'r') as abi_file:
