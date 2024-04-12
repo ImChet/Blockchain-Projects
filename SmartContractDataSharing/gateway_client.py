@@ -112,7 +112,7 @@ if __name__ == "__main__":
     if uploaded_file:
         file_hash = uploaded_file['public']
         # Convert the file_hash string to bytes using UTF-8 encoding
-        register_response = register_data(file_hash.encode('utf-8'), uploaded_file['filename'], "", int(uploaded_file['size']))
+        register_response = register_data(file_hash.encode('utf-8'), uploaded_file['filename'], '', int(uploaded_file.get('size', 0)))
         if register_response:
             transfer_response = transfer_data(file_hash, '0xRecipientAddress')
             if transfer_response:
