@@ -29,6 +29,12 @@ fi
 # Export the contract address for the middleware to use
 export CONTRACT_ADDRESS
 
+# Check if the environment variable CONTRACT_ADDRESS matches the deployed contract address
+if [ "$CONTRACT_ADDRESS" != "$CONTRACT_ADDRESS" ]; then
+  echo "Error: CONTRACT_ADDRESS environment variable does not match the deployed contract address."
+  exit 1
+fi
+
 # Start the Middleware
 echo "Starting the middleware..."
 python3 $PROJECT_ROOT/eth_middleware.py &
