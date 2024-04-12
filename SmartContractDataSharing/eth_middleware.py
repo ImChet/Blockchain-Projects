@@ -12,6 +12,8 @@ class EthereumMiddleware:
 
         # Load contract details
         contract_address = os.getenv('CONTRACT_ADDRESS')
+        print(f'\n---\ncontract_address for eth_middleware.py: {contract_address}\n---\n')
+
         if not contract_address:
             raise EnvironmentError('CONTRACT_ADDRESS environment variable not set.')
         self.contract_address = Web3.to_checksum_address(contract_address)
@@ -25,30 +27,18 @@ class EthereumMiddleware:
             abi=self.contract_abi  # Use the instance variable here
         )
 
-    # Use this to handle sending transactions
-    def send_transaction(self, function, account):
-        tx_hash = function.transact({'from': account})
-        receipt = self.web3.eth.waitForTransactionReceipt(tx_hash)
-        return receipt
-
-    def register_data(self, data_hash, filename, file_cid, size, account):
-        # Decode Base58 string to bytes
-        try:
-            data_hash_bytes_full = base58.b58decode(data_hash)
-            # Take only the hash part, excluding the first two metadata bytes
-            data_hash_bytes = data_hash_bytes_full[2:34]
-        except ValueError as e:
-            raise ValueError(f"Invalid Base58 value: {data_hash}") from e
-
-        # Ensure the decoded bytes are 32 bytes in length
+def register_data(self, data_hash, filename, file_cid, size, account):
+    try:
+        data_hash_bytes = base58.b58decode(data_hash)[2:34]
         if len(data_hash_bytes) != 32:
-            raise ValueError("The decoded data hash must be exactly 32 bytes in length.")
-
-        # Continue with the smart contract interaction using the bytes
-        function = self.contract.functions.register(data_hash_bytes, filename, file_cid, size)
-        tx_hash = function.transact({'from': account})
-        receipt = self.web3.eth.waitForTransactionReceipt(tx_hash)
-        return receipt
+            raise ValueError("Data hash must be exactly 32 bytes after Base58 decoding.")
+        tx_hash = self.contract.functions.register(
+            data_hash_bytes, filename, file_cid, size
+        ).transact({'from': account})
+        return self.web3.eth.waitForTransactionReceipt(tx_hash)
+    except ValueError as e:
+        print(f"Error registering data: {str(e)}")
+        return None
 
     def query_data(self, data_hash):
         # Call the query function from the smart contract
