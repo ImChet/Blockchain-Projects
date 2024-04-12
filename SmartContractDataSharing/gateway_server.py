@@ -38,7 +38,7 @@ def upload_file_to_ipfs():
 def download_file_from_ipfs(file_hash):
     download_path = f'/tmp/{file_hash}'
     # Assume filename is stored or can be retrieved; here just appending 'dl_' prefix
-    # filename = f'dl_{file_hash}'
+    filename = f'dl_{file_hash}'
     if middleware.download_file(file_hash, download_path):
         return send_file(download_path, as_attachment=True, download_name=filename)
     else:
