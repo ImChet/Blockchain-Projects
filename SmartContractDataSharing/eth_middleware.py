@@ -35,7 +35,14 @@ class EthereumMiddleware:
             # Convert the data hash to bytes32
             data_hash_bytes = bytes.fromhex(data_hash.encode().hex())
 
-            # Invoke the register function on the contract
+            # Ensure filename and file_cid are strings
+            filename = str(filename)
+            file_cid = str(file_cid)
+
+            # Ensure size is an integer
+            size = int(size)
+
+            # Call the register function with the correct types
             tx_hash = self.contract.functions.register(
                 data_hash_bytes, filename, file_cid, size
             ).transact({'from': account})
