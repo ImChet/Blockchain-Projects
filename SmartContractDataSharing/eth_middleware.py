@@ -1,6 +1,8 @@
 from web3 import Web3
 import os
 import json
+import base58
+import binascii
 
 class EthereumMiddleware:
     def __init__(self, rpc_url, contract_address):
@@ -9,16 +11,24 @@ class EthereumMiddleware:
             raise ConnectionError("Unable to connect to the Ethereum node.")
 
         # Load contract details
-        self.contract_address = contract_address
+        contract_address = os.getenv('CONTRACT_ADDRESS')
+        print(f'\n---\ncontract_address for eth_middleware.py: {contract_address}\n---\n')
+
+        if not contract_address:
+            raise EnvironmentError('CONTRACT_ADDRESS environment variable not set.')
+        self.contract_address = Web3.to_checksum_address(contract_address)
         
         # Load the ABI from the contract JSON file
         with open('build/contracts/DataToken.json', 'r') as abi_file:
-            self.contract_abi = json.load(abi_file)['abi']
+            self.contract_abi = json.load(abi_file)['abi']  # Make sure this variable is assigned
 
         self.contract = self.web3.eth.contract(
             address=self.contract_address, 
-            abi=self.contract_abi
+            abi=self.contract_abi  # Use the instance variable here
         )
+
+# wait_for_transaction_receipt
+# to_bytes
 
     def register_data(self, data_hash, filename, file_cid, size, account):
         try:
