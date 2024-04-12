@@ -20,51 +20,28 @@ class EthereumMiddleware:
         )
 
     def register_data(self, data_hash, filename, file_cid, size, account):
-            """
-            Register data on the smart contract.
-            
-            Args:
-                data_hash (str): Hash of the data.
-                filename (str): Name of the file.
-                file_cid (str): Content ID of the file on IPFS.
-                size (int): Size of the file.
-                account (str): Ethereum address of the account registering the data.
-            
-            Returns:
-                dict: Transaction receipt if successful, None otherwise.
-            """
-            try:
-                # Validate input data types
-                if not isinstance(data_hash, str) or not data_hash.startswith('0x'):
-                    raise ValueError("Invalid data hash.")
-                if not isinstance(filename, str) or len(filename) > 32:
-                    raise ValueError("Invalid filename.")
-                if not isinstance(file_cid, str) or len(file_cid) > 32:
-                    raise ValueError("Invalid file CID.")
-                if not isinstance(size, int) or size <= 0:
-                    raise ValueError("Invalid size.")
-                if not self.web3.isAddress(account):
-                    raise ValueError("Invalid Ethereum address.")
+        try:
+            # Convert data_hash to bytes32
+            data_hash_bytes = Web3.to_bytes(hexstr=data_hash)
 
-                # Convert data types
-                data_hash_bytes = Web3.toBytes(hexstr=data_hash)
-                filename_bytes32 = Web3.toBytes(text=filename.ljust(32, '\x00'))
-                file_cid_bytes32 = Web3.toBytes(text=file_cid.ljust(32, '\x00'))
-                size_uint256 = self.web3.toWei(size, 'ether')  # Convert to wei (uint256)
+            # Convert filename and file_cid to bytes32
+            filename_bytes32 = Web3.to_bytes(text=filename, encoding='utf-8')
+            file_cid_bytes32 = Web3.to_bytes(text=file_cid, encoding='utf-8')
 
-                # Call the register function with the correct types
-                tx_hash = self.contract.functions.register(
-                    data_hash_bytes, filename_bytes32, file_cid_bytes32, size_uint256
-                ).transact({'from': account})
+            # Convert size to uint256
+            size_uint256 = self.web3.to_int(size)
 
-                # Wait for transaction receipt
-                receipt = self.web3.eth.waitForTransactionReceipt(tx_hash)
-                return receipt
-            except Exception as e:
-                print(f"Error registering data: {str(e)}")
-                return None
+            # Call the register function with the correct types
+            tx_hash = self.contract.functions.register(
+                data_hash_bytes, filename_bytes32, file_cid_bytes32, size_uint256
+            ).transact({'from': account})
 
-
+            # Wait for transaction receipt
+            receipt = self.web3.eth.wait_for_transaction_receipt(tx_hash)
+            return receipt
+        except ValueError as e:
+            print(f"Error registering data: {str(e)}")
+            return None
 
     def query_data(self, data_hash):
         # Call the query function from the smart contract
