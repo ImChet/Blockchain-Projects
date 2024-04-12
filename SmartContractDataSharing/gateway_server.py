@@ -27,12 +27,12 @@ def upload_file_to_ipfs():
     response['hash'] = generate_metadata_hash(response)  # Add hash of metadata to response
     return jsonify(response), 200  # Return the JSON response from IPFS
 
-# Endpoint to handle file downloads
 @app.route('/download/<string:file_hash>', methods=['GET'])
 def download_file_from_ipfs(file_hash):
-    download_path = f'/tmp/dl_{file_hash}'
+    download_path = f'/tmp/{file_hash}'
     if middleware.download_file(file_hash, download_path):
-        return send_file(download_path, as_attachment=True, attachment_filename=f'dl_{file_hash}')
+        # Update this line to use 'download_name' instead of 'attachment_filename'
+        return send_file(download_path, as_attachment=True, download_name=f'dl_{file_hash}')
     else:
         abort(404, 'File not found')
 
