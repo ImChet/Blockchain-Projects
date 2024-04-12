@@ -1,14 +1,10 @@
 import requests
+from requests.utils import requote_uri
 from web3 import Web3
-
-# Configuration
-GATEWAY_URL = "http://127.0.0.1:8080"
 
 # Connect to Ganache and get accounts
 web3 = Web3(Web3.HTTPProvider("http://127.0.0.1:8545"))
 accounts = web3.eth.accounts
-
-# Use the first account as the default account for this example
 default_account = accounts[0]
 print(f"Using the first account from Ganache: {default_account}")
 
@@ -68,75 +64,61 @@ def download_from_gateway(file_hash):
         print('Download failed')
 
 
-def register_data_on_gateway(data_hash, filename, file_cid, size):
+def register_data(file_hash, filename, file_cid, size):
+    print("Registering data on the blockchain...")
     data = {
-        'data_hash': data_hash,
+        'data_hash': file_hash,
         'filename': filename,
         'file_cid': file_cid,
         'size': size,
         'account': default_account
     }
-    response = requests.post(f"{GATEWAY_URL}/register_data", json=data)
-    handle_response(response)
+    response = requests.post('http://localhost:8080/register', json=data)
+    print("Register response:", response.text)
+    return response.json() if response.ok else None
 
-def transfer_data_on_gateway(data_hash, to_address):
+def transfer_data(data_hash, to_address):
+    print(f"Transferring data token with hash {data_hash}...")
     data = {
         'data_hash': data_hash,
         'from_address': default_account,
         'to_address': to_address
     }
-    response = requests.post(f"{GATEWAY_URL}/transfer_data", json=data)
-    handle_response(response)
+    response = requests.post('http://localhost:8080/transfer', json=data)
+    print("Transfer response:", response.text)
+    return response.json() if response.ok else None
 
-def burn_data_on_gateway(data_hash):
+def burn_data(data_hash):
+    print(f"Burning data token with hash {data_hash}...")
     data = {
         'data_hash': data_hash,
         'from_address': default_account
     }
-    response = requests.post(f"{GATEWAY_URL}/burn_data", json=data)
-    handle_response(response)
+    response = requests.post('http://localhost:8080/burn', json=data)
+    print("Burn response:", response.text)
+    return response.json() if response.ok else None
 
-def query_tracker_on_gateway(data_hash):
-    response = requests.get(f"{GATEWAY_URL}/query_tracker", params={'data_hash': data_hash})
-    handle_response(response)
+def query_tracker(data_hash):
+    print(f"Querying tracker for data token with hash {data_hash}...")
+    response = requests.get(f'http://localhost:8080/tracker?data_hash={data_hash}')
+    print("Tracker response:", response.text)
+    return response.json() if response.ok else None
 
-# Example usage with print statements for better traceability
+# Example usage
 if __name__ == "__main__":
-    print("Starting the client script...")
-
-    # Upload a file to the gateway
-    print("Uploading file to gateway...")
-    upload_response = upload_to_gateway('/practical/file.txt')
-    if upload_response:
-        print("Upload successful. File hash:", upload_response['public'])
-        
-        # Register data on the Ethereum blockchain
-        file_hash = upload_response['public']
-        print("Registering data on the blockchain...")
-        register_response = register_data_on_gateway(
-            file_hash, 
-            upload_response['filename'], 
-            file_hash, 
-            upload_response['size']
-        )
-        print("Register response:", register_response)
-
-        # Transfer data token to another address
-        print("Transferring data token...")
-        transfer_response = transfer_data_on_gateway(file_hash, '0xRecipientAddress')  # Make sure to replace this with an actual recipient address
-        print("Transfer response:", transfer_response)
-
-        # Burn the data token
-        print("Burning data token...")
-        burn_response = burn_data_on_gateway(file_hash)
-        print("Burn response:", burn_response)
-
-        # Query the transfer tracker
-        print("Querying transfer tracker...")
-        tracker_response = query_tracker_on_gateway(file_hash)
-        print("Tracker response:", tracker_response)
-
-        # Download the file back from the gateway
-        print("Downloading file from gateway...")
-        download_from_gateway(file_hash)
-        print("Download process completed.")
+    print("Client script started.")
+    print("Using account:", default_account)
+    
+    uploaded_file = upload_to_gateway('/practical/file.txt')
+    if uploaded_file:
+        file_hash = uploaded_file['public']
+        register_response = register_data(file_hash, uploaded_file['filename'], file_hash, uploaded_file['size'])
+        if register_response:
+            transfer_response = transfer_data(file_hash, '0xRecipientAddress')
+            if transfer_response:
+                burn_response = burn_data(file_hash)
+                if burn_response:
+                    tracker_response = query_tracker(file_hash)
+                    if tracker_response:
+                        download_from_gateway(file_hash)
+    print("Client script finished.")
