@@ -9,14 +9,10 @@ default_account = accounts[0]
 print(f"Using the first account from Ganache: {default_account}")
 
 def handle_response(response):
-    try:
-        if response.ok:
-            return response.json()
-        else:
-            print(f"Error: {response.status_code}, Detail: {response.text}")
-            return None
-    except ValueError:
-        print("Invalid response received.")
+    if response.status_code == 200:
+        return response.json()  # Assuming response is in JSON format
+    else:
+        print("Error:", response.text)
         return None
 
 # Uploads a file to the Flask server via HTTP POST
@@ -64,14 +60,14 @@ def download_from_gateway(file_hash):
         # Handle download errors
         print('Download failed')
 
-def register_data(data_hash, filename, file_cid, size):
+def register_data(data_hash, filename, file_cid, size, account):
     print("Registering data on the blockchain...")
     data = {
         'data_hash': data_hash.hex(),
         'filename': filename,
         'file_cid': file_cid,
         'size': size,
-        'account': default_account
+        'account': account
     }
     response = requests.post('http://localhost:8080/register', json=data)
     return handle_response(response)
