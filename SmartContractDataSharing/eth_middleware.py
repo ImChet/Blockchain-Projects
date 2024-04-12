@@ -16,9 +16,12 @@ class EthereumMiddleware:
         
         # Load the ABI from the contract JSON file
         with open('build/contracts/DataToken.json', 'r') as abi_file:
-            contract_abi = json.load(abi_file)['abi']
+            self.contract_abi = json.load(abi_file)['abi']  # Make sure this variable is assigned
 
-        self.contract = self.web3.eth.contract(address=self.contract_address, abi=self.contract_abi)
+        self.contract = self.web3.eth.contract(
+            address=self.contract_address, 
+            abi=self.contract_abi  # Use the instance variable here
+        )
 
     # Use this to handle sending transactions
     def send_transaction(self, function, account):
