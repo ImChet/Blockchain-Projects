@@ -26,7 +26,7 @@ class EthereumMiddleware:
             address=self.contract_address, 
             abi=self.contract_abi  # Use the instance variable here
         )
-        
+
 # wait_for_transaction_receipt
 # to_bytes
     def register_data(self, data_hash, filename, file_cid, size, account):
@@ -39,7 +39,7 @@ class EthereumMiddleware:
             size = int(size)
 
             # Convert data hash to bytes
-            data_hash_bytes = Web3.toBytes(hexstr=data_hash)
+            data_hash_bytes = Web3.to_bytes(hexstr=data_hash)
 
             # Send transaction to register data
             tx_hash = self.contract.functions.register(
