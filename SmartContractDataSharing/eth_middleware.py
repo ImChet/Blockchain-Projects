@@ -29,21 +29,17 @@ class EthereumMiddleware:
 
     def register_data(self, data_hash, filename, file_cid, size, account):
         try:
-            data_hash_bytes = base58.b58decode(data_hash)[2:34]
-            if len(data_hash_bytes) != 32:
-                raise ValueError("Data hash must be exactly 32 bytes after Base58 decoding.")
-            
-            print("Registering data with the following parameters:")
-            print("Data hash:", data_hash_bytes)
-            print("Filename:", filename)
-            print("File CID:", file_cid)
-            print("Size:", size)
-            
+            # Prepare data hash as bytes32
+            data_hash_bytes = Web3.toBytes(hexstr=data_hash)
+
+            # Invoke the register function on the contract
             tx_hash = self.contract.functions.register(
                 data_hash_bytes, filename, file_cid, size
             ).transact({'from': account})
-            
-            return self.web3.eth.waitForTransactionReceipt(tx_hash)
+
+            # Wait for transaction receipt
+            receipt = self.web3.eth.waitForTransactionReceipt(tx_hash)
+            return receipt
         except ValueError as e:
             print(f"Error registering data: {str(e)}")
             return None
