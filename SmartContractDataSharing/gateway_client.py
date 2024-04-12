@@ -26,7 +26,6 @@ def upload_to_gateway(file_path):
 def download_from_gateway(file_hash):
     # Make a GET request to download the file by its hash
     response = requests.get(requote_uri(f'http://localhost:8080/download/{file_hash}'), stream=True)
-    print(f'Response from download_from_gateway(): {response}')
     
     if response.status_code == 200:
         # Extract the filename from the Content-Disposition header
@@ -51,5 +50,4 @@ def download_from_gateway(file_hash):
 upload_response = upload_to_gateway('/practical/file.txt')  # Replace '/practical/file.txt' with your file path
 if upload_response:
     file_hash = upload_response['public']
-    print(f'public: {file_hash}')
     download_from_gateway(file_hash)
