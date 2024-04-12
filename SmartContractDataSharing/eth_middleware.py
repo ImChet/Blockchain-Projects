@@ -31,6 +31,8 @@ class EthereumMiddleware:
 
     def register_data(self, data_hash, filename, file_cid, size, account):            
             # Call smart contract function with bytes
+            print(f'data_hash: {data_hash}')
+            print(f'type(data_hash): {type(data_hash)}')
             function = self.contract.functions.register(Web3.to_bytes(data_hash), filename, file_cid, size)
             tx_hash = function.transact({'from': account})
             receipt = self.web3.eth.waitForTransactionReceipt(tx_hash)
