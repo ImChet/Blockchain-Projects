@@ -33,7 +33,7 @@ class EthereumMiddleware:
     def register_data(self, data_hash, filename, file_cid, size, account):
         try:
             # Convert the data hash to bytes32
-            data_hash_bytes = Web3.to_bytes(hexstr=(data_hash.encode()).hex())
+            data_hash_bytes = bytes.fromhex(data_hash.encode().hex())
 
             # Invoke the register function on the contract
             tx_hash = self.contract.functions.register(
