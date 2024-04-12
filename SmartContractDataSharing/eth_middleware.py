@@ -27,33 +27,33 @@ class EthereumMiddleware:
             abi=self.contract_abi  # Use the instance variable here
         )
 
-def register_data(self, data_hash, filename, file_cid, size, account):
-    try:
-        data_hash_bytes = base58.b58decode(data_hash)[2:34]
-        if len(data_hash_bytes) != 32:
-            raise ValueError("Data hash must be exactly 32 bytes after Base58 decoding.")
-        tx_hash = self.contract.functions.register(
-            data_hash_bytes, filename, file_cid, size
-        ).transact({'from': account})
-        return self.web3.eth.waitForTransactionReceipt(tx_hash)
-    except ValueError as e:
-        print(f"Error registering data: {str(e)}")
-        return None
+    def register_data(self, data_hash, filename, file_cid, size, account):
+        try:
+            data_hash_bytes = base58.b58decode(data_hash)[2:34]
+            if len(data_hash_bytes) != 32:
+                raise ValueError("Data hash must be exactly 32 bytes after Base58 decoding.")
+            tx_hash = self.contract.functions.register(
+                data_hash_bytes, filename, file_cid, size
+            ).transact({'from': account})
+            return self.web3.eth.waitForTransactionReceipt(tx_hash)
+        except ValueError as e:
+            print(f"Error registering data: {str(e)}")
+            return None
 
-def query_data(self, data_hash):
-    # Call the query function from the smart contract
-    return self.contract.functions.query(Web3.to_bytes(hexstr=data_hash)).call()
+    def query_data(self, data_hash):
+        # Call the query function from the smart contract
+        return self.contract.functions.query(Web3.to_bytes(hexstr=data_hash)).call()
 
-def transfer_data(self, data_hash, from_address, to_address):
-    # Call the transferData function from the smart contract
-    function = self.contract.functions.transferData(Web3.to_bytes(hexstr=data_hash), to_address)
-    return self.send_transaction(function, from_address)
+    def transfer_data(self, data_hash, from_address, to_address):
+        # Call the transferData function from the smart contract
+        function = self.contract.functions.transferData(Web3.to_bytes(hexstr=data_hash), to_address)
+        return self.send_transaction(function, from_address)
 
-def burn_data(self, data_hash, from_address):
-    # Call the burn function from the smart contract
-    function = self.contract.functions.burn(Web3.to_bytes(hexstr=data_hash))
-    return self.send_transaction(function, from_address)
+    def burn_data(self, data_hash, from_address):
+        # Call the burn function from the smart contract
+        function = self.contract.functions.burn(Web3.to_bytes(hexstr=data_hash))
+        return self.send_transaction(function, from_address)
 
-def query_tracker(self, data_hash):
-    # Call the queryTracker function from the smart contract
-    return self.contract.functions.queryTracker(Web3.to_bytes(hexstr=data_hash)).call()
+    def query_tracker(self, data_hash):
+        # Call the queryTracker function from the smart contract
+        return self.contract.functions.queryTracker(Web3.to_bytes(hexstr=data_hash)).call()
