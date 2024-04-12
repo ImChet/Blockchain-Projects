@@ -13,7 +13,7 @@ contract DataToken {
     }
 
     mapping(bytes32 => Data) public dataTokens;
-    mapping(bytes32 => bytes32[]) public dataTransferLog;
+    mapping(bytes32 => address[]) public dataTransferLog;
 
     event TokenRegistered(bytes32 indexed dataHash, address indexed owner);
     event TokenTransferred(bytes32 indexed dataHash, address indexed from, address indexed to);
