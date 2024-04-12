@@ -43,7 +43,7 @@ contract DataToken {
         emit TokenTransferred(dataHash, msg.sender, to);
     }
 
-    function queryTracker(bytes32 dataHash) external view returns (bytes32[] memory) {
+    function queryTracker(bytes32 dataHash) external view returns (address[] memory) {
         return dataTransferLog[dataHash];
     }
 
