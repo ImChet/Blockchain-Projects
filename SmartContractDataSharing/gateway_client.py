@@ -62,6 +62,11 @@ def download_from_gateway(file_hash):
 
 def register_data(data_hash, filename, file_cid, size, account):
     print("Registering data on the blockchain...")
+    print(f"Data hash: {data_hash}")
+    print(f"Filename: {filename}")
+    print(f"File CID: {file_cid}")
+    print(f"Size: {size}")
+    print(f"Account: {account}")
     data = {
         'data_hash': data_hash.hex(),
         'filename': filename,
@@ -108,6 +113,7 @@ if __name__ == "__main__":
     if uploaded_file:
         file_hash = uploaded_file['public']
         # Convert the file_hash string to bytes using UTF-8 encoding
+        print(f"File hash: {file_hash}")
         register_response = register_data(Web3.to_bytes(text=file_hash), uploaded_file['filename'], '', int(uploaded_file.get('size', 0)), default_account)
         if register_response:
             transfer_response = transfer_data(file_hash, '0xRecipientAddress')
