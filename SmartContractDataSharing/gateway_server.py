@@ -9,8 +9,7 @@ import json
 app = Flask(__name__)
 ipfs_middleware = IPFSMiddleware('http://localhost:5001')  # Initialize middleware with IPFS API URL
 app = Flask(__name__)
-eth_middleware = EthereumMiddleware('http://localhost:8545', 'your_contract_address', contract_abi)  # Initialize Ethereum middleware
-
+eth_middleware = EthereumMiddleware('http://localhost:8545', os.environ['CONTRACT_ADDRESS'])
 
 # In-memory mapping of file hashes to original filenames
 file_mapping = {}
