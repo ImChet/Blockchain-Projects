@@ -39,5 +39,5 @@ def download_from_gateway(file_hash):
 # Example usage of the client functions
 upload_response = upload_to_gateway('/practical/file.txt')  # Replace '/practical/file.txt' with your file path
 if upload_response:
-    file_hash = upload_response['Hash']
+    file_hash = upload_response['hash']
     download_from_gateway(file_hash)
