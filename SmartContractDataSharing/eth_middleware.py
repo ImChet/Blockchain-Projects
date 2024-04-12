@@ -21,6 +21,8 @@ class EthereumMiddleware:
 
     def register_data(self, data_hash, filename, file_cid, size, account):
         try:
+            print(f"Registering data - data_hash: {data_hash}, filename: {filename}, file_cid: {file_cid}, size: {size}, account: {account}")
+
             # Convert data_hash to bytes32
             data_hash_bytes = self.web3.to_bytes(hexstr=data_hash)
 
@@ -31,6 +33,7 @@ class EthereumMiddleware:
             # Ensure size is an integer
             size_int = int(size)
 
+            print("Calling register function on the contract.")
             # Call the register function with the correct types
             tx_hash = self.contract.functions.register(
                 data_hash_bytes, filename_str, file_cid_str, size_int
@@ -38,11 +41,11 @@ class EthereumMiddleware:
 
             # Wait for transaction receipt
             receipt = self.web3.eth.wait_for_transaction_receipt(tx_hash)
+            print("Registration transaction receipt:", receipt)
             return receipt
         except ValueError as e:
             print(f"Error registering data: {str(e)}")
             return None
-
 
     def query_data(self, data_hash):
         # Call the query function from the smart contract
