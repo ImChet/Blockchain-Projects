@@ -60,18 +60,13 @@ def download_file_from_ipfs(file_hash):
 
 @app.route('/register', methods=['POST'])
 def register_data():
-    # Extract data from the request
-    data_hash_hex = request.json.get('data_hash')
+    data_hash = request.json.get('data_hash')
     filename = request.json.get('filename')
     file_cid = request.json.get('file_cid')
     size = request.json.get('size')
     account = request.json.get('account')
-    
-    # Convert the hexadecimal string back to bytes
-    data_hash_bytes = bytes.fromhex(data_hash_hex)
 
-    # Interact with the Ethereum middleware to register the data
-    receipt = eth_middleware.register_data(data_hash_bytes, filename, file_cid, size, account)
+    receipt = eth_middleware.register_data(data_hash, filename, file_cid, size, account)
     if receipt:
         return jsonify({'status': 'success', 'receipt': receipt}), 200
     else:
