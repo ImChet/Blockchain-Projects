@@ -108,7 +108,7 @@ if __name__ == "__main__":
     if uploaded_file:
         file_hash = uploaded_file['public']
         # Convert the file_hash string to bytes using UTF-8 encoding
-        register_response = register_data(Web3.to_bytes(text=file_hash), uploaded_file['filename'], '', int(uploaded_file.get('size', 0)))
+        register_response = register_data(Web3.to_bytes(text=file_hash), uploaded_file['filename'], '', int(uploaded_file.get('size', 0)), default_account)
         if register_response:
             transfer_response = transfer_data(file_hash, '0xRecipientAddress')
             if transfer_response:
