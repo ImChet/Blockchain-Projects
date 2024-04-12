@@ -26,6 +26,7 @@ def upload_to_gateway(file_path):
 def download_from_gateway(file_hash):
     # Make a GET request to download the file by its hash
     response = requests.get(f'http://localhost:8080/download/{file_hash}', stream=True)
+    print(f'Response from download_from_gateway(): {response}')
     if response.status_code == 200:
         # Save the downloaded content to a file
         with open(f'downloaded_{file_hash}', 'wb') as f:
