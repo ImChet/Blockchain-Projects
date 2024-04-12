@@ -5,7 +5,7 @@ import json
 class EthereumMiddleware:
     def __init__(self, rpc_url, contract_address):
         self.web3 = Web3(Web3.HTTPProvider(rpc_url))
-        if not self.web3.isConnected():
+        if not self.web3.is_connected():
             raise ConnectionError("Unable to connect to the Ethereum node.")
 
         # Load contract details
