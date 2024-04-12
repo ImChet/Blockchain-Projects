@@ -1,6 +1,8 @@
 from web3 import Web3
 import os
 import json
+import base58
+import binascii
 
 class EthereumMiddleware:
     def __init__(self, rpc_url, contract_address):
@@ -29,14 +31,23 @@ class EthereumMiddleware:
         receipt = self.web3.eth.waitForTransactionReceipt(tx_hash)
         return receipt
 
-    def register_data(self, data_hash, filename, file_cid, size, account):            
-            # Call smart contract function with bytes
-            print(f'data_hash: {data_hash}')
-            print(f'type(data_hash): {type(data_hash)}')
-            function = self.contract.functions.register(Web3.to_bytes(data_hash), filename, file_cid, size)
-            tx_hash = function.transact({'from': account})
-            receipt = self.web3.eth.waitForTransactionReceipt(tx_hash)
-            return receipt
+    def register_data(self, data_hash, filename, file_cid, size, account):
+        # Decode Base58 string to bytes
+        try:
+            data_hash_bytes = base58.b58decode(data_hash)
+        except ValueError as e:
+            raise ValueError(f"Invalid Base58 value: {data_hash}") from e
+
+        # Ensure the decoded bytes are 32 bytes in length
+        if len(data_hash_bytes) != 32:
+            # You may need to adjust this depending on your exact requirements
+            raise ValueError("The decoded data hash must be exactly 32 bytes in length.")
+
+        # Continue with the smart contract interaction using the bytes
+        function = self.contract.functions.register(data_hash_bytes, filename, file_cid, size)
+        tx_hash = function.transact({'from': account})
+        receipt = self.web3.eth.waitForTransactionReceipt(tx_hash)
+        return receipt
 
     def query_data(self, data_hash):
         # Call the query function from the smart contract
