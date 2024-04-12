@@ -64,10 +64,10 @@ def download_from_gateway(file_hash):
         # Handle download errors
         print('Download failed')
 
-def register_data(file_hash, filename, file_cid, size):
+def register_data(data_hash, filename, file_cid, size):
     print("Registering data on the blockchain...")
     data = {
-        'data_hash': file_hash.hex(),  # Convert bytes to hexadecimal string
+        'data_hash': data_hash.hex(),
         'filename': filename,
         'file_cid': file_cid,
         'size': size,
