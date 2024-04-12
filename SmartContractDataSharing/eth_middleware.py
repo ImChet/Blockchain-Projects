@@ -29,15 +29,9 @@ class EthereumMiddleware:
         receipt = self.web3.eth.waitForTransactionReceipt(tx_hash)
         return receipt
 
-    def register_data(self, data_hash, filename, file_cid, size, account):
-            # Remove '0x' prefix and convert to bytes
-            print(f'data_hash: {data_hash}')
-            if data_hash.startswith('0x'):
-                data_hash_bytes = bytes.fromhex(data_hash[2:])
-            else:
-                data_hash_bytes = bytes.fromhex(data_hash)
+    def register_data(self, data_hash, filename, file_cid, size, account):            
             # Call smart contract function with bytes
-            function = self.contract.functions.register(data_hash_bytes, filename, file_cid, size)
+            function = self.contract.functions.register(Web3.to_bytes(data_hash), filename, file_cid, size)
             tx_hash = function.transact({'from': account})
             receipt = self.web3.eth.waitForTransactionReceipt(tx_hash)
             return receipt
