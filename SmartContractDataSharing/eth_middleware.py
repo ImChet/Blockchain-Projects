@@ -33,6 +33,12 @@ class EthereumMiddleware:
             # Ensure size is an integer
             size_int = int(size)
 
+            print(f"data_hash_bytes type: {type(data_hash_bytes)}")
+            print(f"filename_str type: {type(filename_str)}")
+            print(f"file_cid_str type: {type(file_cid_str)}")
+            print(f"size_int type: {type(size_int)}")
+
+
             print("Calling register function on the contract.")
             # Call the register function with the correct types
             tx_hash = self.contract.functions.register(
