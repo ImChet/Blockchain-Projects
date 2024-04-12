@@ -18,18 +18,25 @@ class EthereumMiddleware:
             address=self.contract_address, 
             abi=self.contract_abi
         )
-
+        
     def register_data(self, data_hash, filename, file_cid, size, account):
         try:
             # Convert data_hash to bytes32
-            data_hash_bytes = Web3.to_bytes(hexstr=data_hash)
+            data_hash_bytes = bytes.fromhex(data_hash[2:])  # Remove '0x' prefix and convert to bytes
 
             # Convert filename and file_cid to bytes32
-            filename_bytes32 = Web3.to_bytes(text=filename, encoding='utf-8')
-            file_cid_bytes32 = Web3.to_bytes(text=file_cid, encoding='utf-8')
+            filename_bytes32 = filename.encode('utf-8')
+            if len(filename_bytes32) > 32:
+                raise ValueError("Filename exceeds 32 bytes.")
+            filename_bytes32 += b'\x00' * (32 - len(filename_bytes32))  # Pad with null bytes
+
+            file_cid_bytes32 = file_cid.encode('utf-8')
+            if len(file_cid_bytes32) > 32:
+                raise ValueError("File CID exceeds 32 bytes.")
+            file_cid_bytes32 += b'\x00' * (32 - len(file_cid_bytes32))  # Pad with null bytes
 
             # Convert size to uint256
-            size_uint256 = self.web3.to_int(size)
+            size_uint256 = int(size)
 
             # Call the register function with the correct types
             tx_hash = self.contract.functions.register(
@@ -42,6 +49,7 @@ class EthereumMiddleware:
         except ValueError as e:
             print(f"Error registering data: {str(e)}")
             return None
+
 
 
     def query_data(self, data_hash):
