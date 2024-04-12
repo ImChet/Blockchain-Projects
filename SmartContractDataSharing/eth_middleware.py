@@ -3,6 +3,8 @@ import os
 import json
 import base58
 import binascii
+from flask import Flask, request, jsonify, abort, send_file
+
 
 class EthereumMiddleware:
     def __init__(self, rpc_url, contract_address):
@@ -39,7 +41,9 @@ class EthereumMiddleware:
             size = int(size)
 
             # Convert data hash to bytes
-            data_hash_bytes = Web3.to_bytes(hexstr=data_hash)
+            data_hash_hex = request.json.get('data_hash')
+            data_hash_str = data_hash_hex.hex()  # Convert bytes to hexadecimal string
+            data_hash_bytes = Web3.to_bytes(hexstr=data_hash_str)
 
             # Send transaction to register data
             tx_hash = self.contract.functions.register(
