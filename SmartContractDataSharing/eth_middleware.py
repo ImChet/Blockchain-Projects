@@ -27,6 +27,9 @@ class EthereumMiddleware:
             abi=self.contract_abi  # Use the instance variable here
         )
 
+# wait_for_transaction_receipt
+# to_bytes
+
     def register_data(self, data_hash, filename, file_cid, size, account):
         try:
             # Check if the data hash is a valid hexadecimal string
@@ -34,7 +37,7 @@ class EthereumMiddleware:
                 raise ValueError("Data hash is not a valid hexadecimal string.")
 
             # Convert the data hash to bytes32
-            data_hash_bytes = Web3.toBytes(hexstr=data_hash)
+            data_hash_bytes = Web3.to_bytes(hexstr=data_hash)
 
             # Invoke the register function on the contract
             tx_hash = self.contract.functions.register(
@@ -42,11 +45,12 @@ class EthereumMiddleware:
             ).transact({'from': account})
 
             # Wait for transaction receipt
-            receipt = self.web3.eth.waitForTransactionReceipt(tx_hash)
+            receipt = self.web3.eth.wait_for_transaction_receipt(tx_hash)
             return receipt
         except ValueError as e:
             print(f"Error registering data: {str(e)}")
             return None
+
 
     def query_data(self, data_hash):
         # Call the query function from the smart contract
