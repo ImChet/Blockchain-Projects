@@ -33,7 +33,7 @@ class EthereumMiddleware:
     def register_data(self, data_hash, filename, file_cid, size, account):
         try:
             # Convert the data hash to bytes32
-            data_hash_bytes = bytes.fromhex(data_hash)
+            data_hash_bytes = bytes.fromhex(data_hash.encode().hex())
 
             # Ensure filename and file_cid are strings
             filename = str(filename)
