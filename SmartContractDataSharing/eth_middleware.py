@@ -31,7 +31,7 @@ class EthereumMiddleware:
 
     def register_data(self, data_hash, filename, file_cid, size, account):
         # Assuming data_hash is already a hex string
-        data_hash_bytes = Web3.toBytes(hexstr=data_hash)  # Convert hex string to bytes
+        data_hash_bytes = Web3.to_bytes(hexstr=data_hash)  # Convert hex string to bytes
         function = self.contract.functions.register(data_hash_bytes, filename, file_cid, size)
         tx_hash = function.transact({'from': account})
         receipt = self.web3.eth.waitForTransactionReceipt(tx_hash)
@@ -39,18 +39,18 @@ class EthereumMiddleware:
 
     def query_data(self, data_hash):
         # Call the query function from the smart contract
-        return self.contract.functions.query(Web3.toBytes(hexstr=data_hash)).call()
+        return self.contract.functions.query(Web3.to_bytes(hexstr=data_hash)).call()
 
     def transfer_data(self, data_hash, from_address, to_address):
         # Call the transferData function from the smart contract
-        function = self.contract.functions.transferData(Web3.toBytes(hexstr=data_hash), to_address)
+        function = self.contract.functions.transferData(Web3.to_bytes(hexstr=data_hash), to_address)
         return self.send_transaction(function, from_address)
 
     def burn_data(self, data_hash, from_address):
         # Call the burn function from the smart contract
-        function = self.contract.functions.burn(Web3.toBytes(hexstr=data_hash))
+        function = self.contract.functions.burn(Web3.to_bytes(hexstr=data_hash))
         return self.send_transaction(function, from_address)
 
     def query_tracker(self, data_hash):
         # Call the queryTracker function from the smart contract
-        return self.contract.functions.queryTracker(Web3.toBytes(hexstr=data_hash)).call()
+        return self.contract.functions.queryTracker(Web3.to_bytes(hexstr=data_hash)).call()
