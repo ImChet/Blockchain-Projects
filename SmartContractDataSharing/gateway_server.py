@@ -59,39 +59,29 @@ def download_file_from_ipfs(file_hash):
     else:
         abort(404, 'File not found')
 
-@app.route('/register_data', methods=['POST'])
-def register_data():
-    # You would collect necessary info from the POST request
-    data_hash = request.form['data_hash']
-    filename = request.form['filename']
-    file_cid = request.form['file_cid']
-    size = request.form['size']
-    account = request.form['account']
+@app.route('/query', methods=['GET'])
+def query_data():
+    data_hash = request.args.get('data_hash')
+    data_info = eth_middleware.query_data(data_hash)
+    return jsonify(data_info), 200
 
-    # Register the data using the Ethereum middleware
-    receipt = eth_middleware.register_data(data_hash, filename, file_cid, size, account)
-    return jsonify(receipt), 200
-
-# Endpoint to transfer a data token to another user
-@app.route('/transfer_data', methods=['POST'])
-def transfer_data_token():
+@app.route('/transfer', methods=['POST'])
+def transfer_data():
     data_hash = request.json.get('data_hash')
     from_address = request.json.get('from_address')
     to_address = request.json.get('to_address')
     receipt = eth_middleware.transfer_data(data_hash, from_address, to_address)
     return jsonify(receipt), 200
 
-# Endpoint to burn a data token, effectively deleting it
-@app.route('/burn_data', methods=['POST'])
-def burn_data_token():
+@app.route('/burn', methods=['POST'])
+def burn_data():
     data_hash = request.json.get('data_hash')
     from_address = request.json.get('from_address')
     receipt = eth_middleware.burn_data(data_hash, from_address)
     return jsonify(receipt), 200
 
-# Endpoint to query the transfer log of a data token
-@app.route('/query_tracker', methods=['GET'])
-def get_data_transfer_log():
+@app.route('/tracker', methods=['GET'])
+def query_tracker():
     data_hash = request.args.get('data_hash')
     transfer_log = eth_middleware.query_tracker(data_hash)
     return jsonify(transfer_log), 200
