@@ -1,12 +1,16 @@
 from flask import Flask, request, jsonify, abort, send_file
 from werkzeug.utils import secure_filename
 from ipfs_middleware import IPFSMiddleware
+from eth_middleware import EthereumMiddleware
 import os
 import hashlib
 import json
 
 app = Flask(__name__)
-middleware = IPFSMiddleware('http://localhost:5001')  # Initialize middleware with IPFS API URL
+ipfs_middleware = IPFSMiddleware('http://localhost:5001')  # Initialize middleware with IPFS API URL
+app = Flask(__name__)
+eth_middleware = EthereumMiddleware('http://localhost:8545', 'your_contract_address', contract_abi)  # Initialize Ethereum middleware
+
 
 # In-memory mapping of file hashes to original filenames
 file_mapping = {}
@@ -26,7 +30,7 @@ def upload_file_to_ipfs():
     if file.filename == '':
         abort(400, 'No selected file')
     filename = secure_filename(file.filename)
-    response = middleware.upload_file(file)  # Upload the file via middleware
+    response = ipfs_middleware.upload_file(file)  # Upload the file via middleware
 
     # Store the mapping of the file hash to the original filename
     file_mapping[response['Hash']] = filename
@@ -49,11 +53,48 @@ def download_file_from_ipfs(file_hash):
         abort(404, 'Original filename not found')
 
     download_path = f'/tmp/{file_hash}'
-    if middleware.download_file(file_hash, download_path):
+    if ipfs_middleware.download_file(file_hash, download_path):
         # Use the original filename in the content disposition
         return send_file(download_path, as_attachment=True, download_name=f'dl_{original_filename}')
     else:
         abort(404, 'File not found')
+
+@app.route('/register_data', methods=['POST'])
+def register_data():
+    # You would collect necessary info from the POST request
+    data_hash = request.form['data_hash']
+    filename = request.form['filename']
+    file_cid = request.form['file_cid']
+    size = request.form['size']
+    account = request.form['account']
+
+    # Register the data using the Ethereum middleware
+    receipt = eth_middleware.register_data(data_hash, filename, file_cid, size, account)
+    return jsonify(receipt), 200
+
+# Endpoint to transfer a data token to another user
+@app.route('/transfer_data', methods=['POST'])
+def transfer_data_token():
+    data_hash = request.json.get('data_hash')
+    from_address = request.json.get('from_address')
+    to_address = request.json.get('to_address')
+    receipt = eth_middleware.transfer_data(data_hash, from_address, to_address)
+    return jsonify(receipt), 200
+
+# Endpoint to burn a data token, effectively deleting it
+@app.route('/burn_data', methods=['POST'])
+def burn_data_token():
+    data_hash = request.json.get('data_hash')
+    from_address = request.json.get('from_address')
+    receipt = eth_middleware.burn_data(data_hash, from_address)
+    return jsonify(receipt), 200
+
+# Endpoint to query the transfer log of a data token
+@app.route('/query_tracker', methods=['GET'])
+def get_data_transfer_log():
+    data_hash = request.args.get('data_hash')
+    transfer_log = eth_middleware.query_tracker(data_hash)
+    return jsonify(transfer_log), 200
 
 if __name__ == '__main__':
     app.run(debug=True, port=8080)
