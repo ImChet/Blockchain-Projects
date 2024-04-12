@@ -27,6 +27,7 @@ class EthereumMiddleware:
             abi=self.contract_abi  # Use the instance variable here
         )
 
+
 # wait_for_transaction_receipt
 # to_bytes
     def register_data(self, data_hash, filename, file_cid, size, account):
