@@ -40,20 +40,20 @@ def register_data(self, data_hash, filename, file_cid, size, account):
         print(f"Error registering data: {str(e)}")
         return None
 
-    def query_data(self, data_hash):
-        # Call the query function from the smart contract
-        return self.contract.functions.query(Web3.to_bytes(hexstr=data_hash)).call()
+def query_data(self, data_hash):
+    # Call the query function from the smart contract
+    return self.contract.functions.query(Web3.to_bytes(hexstr=data_hash)).call()
 
-    def transfer_data(self, data_hash, from_address, to_address):
-        # Call the transferData function from the smart contract
-        function = self.contract.functions.transferData(Web3.to_bytes(hexstr=data_hash), to_address)
-        return self.send_transaction(function, from_address)
+def transfer_data(self, data_hash, from_address, to_address):
+    # Call the transferData function from the smart contract
+    function = self.contract.functions.transferData(Web3.to_bytes(hexstr=data_hash), to_address)
+    return self.send_transaction(function, from_address)
 
-    def burn_data(self, data_hash, from_address):
-        # Call the burn function from the smart contract
-        function = self.contract.functions.burn(Web3.to_bytes(hexstr=data_hash))
-        return self.send_transaction(function, from_address)
+def burn_data(self, data_hash, from_address):
+    # Call the burn function from the smart contract
+    function = self.contract.functions.burn(Web3.to_bytes(hexstr=data_hash))
+    return self.send_transaction(function, from_address)
 
-    def query_tracker(self, data_hash):
-        # Call the queryTracker function from the smart contract
-        return self.contract.functions.queryTracker(Web3.to_bytes(hexstr=data_hash)).call()
+def query_tracker(self, data_hash):
+    # Call the queryTracker function from the smart contract
+    return self.contract.functions.queryTracker(Web3.to_bytes(hexstr=data_hash)).call()
