@@ -30,9 +30,12 @@ class EthereumMiddleware:
         return receipt
 
     def register_data(self, data_hash, filename, file_cid, size, account):
-        # Call the register function from the smart contract
-        function = self.contract.functions.register(Web3.toBytes(hexstr=data_hash), filename, file_cid, size)
-        return self.send_transaction(function, account)
+        # Assuming data_hash is already a hex string
+        data_hash_bytes = Web3.toBytes(hexstr=data_hash)  # Convert hex string to bytes
+        function = self.contract.functions.register(data_hash_bytes, filename, file_cid, size)
+        tx_hash = function.transact({'from': account})
+        receipt = self.web3.eth.waitForTransactionReceipt(tx_hash)
+        return receipt
 
     def query_data(self, data_hash):
         # Call the query function from the smart contract
