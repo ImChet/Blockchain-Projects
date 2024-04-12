@@ -67,7 +67,7 @@ def download_from_gateway(file_hash):
 def register_data(file_hash, filename, file_cid, size):
     print("Registering data on the blockchain...")
     data = {
-        'data_hash': file_hash.hex(),
+        'data_hash': file_hash.encode().hex(),
         'filename': filename,
         'file_cid': file_cid,
         'size': size,
