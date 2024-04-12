@@ -100,13 +100,43 @@ def query_tracker_on_gateway(data_hash):
     response = requests.get(f"{GATEWAY_URL}/query_tracker", params={'data_hash': data_hash})
     handle_response(response)
 
-# Example usage
+# Example usage with print statements for better traceability
 if __name__ == "__main__":
+    print("Starting the client script...")
+
+    # Upload a file to the gateway
+    print("Uploading file to gateway...")
     upload_response = upload_to_gateway('/practical/file.txt')
     if upload_response:
+        print("Upload successful. File hash:", upload_response['public'])
+        
+        # Register data on the Ethereum blockchain
         file_hash = upload_response['public']
-        register_data_on_gateway(file_hash, upload_response['filename'], file_hash, upload_response['size'])
-        transfer_data_on_gateway(file_hash, '0xRecipientAddress')
-        burn_data_on_gateway(file_hash)
-        query_tracker_on_gateway(file_hash)
+        print("Registering data on the blockchain...")
+        register_response = register_data_on_gateway(
+            file_hash, 
+            upload_response['filename'], 
+            file_hash, 
+            upload_response['size']
+        )
+        print("Register response:", register_response)
+
+        # Transfer data token to another address
+        print("Transferring data token...")
+        transfer_response = transfer_data_on_gateway(file_hash, '0xRecipientAddress')  # Make sure to replace this with an actual recipient address
+        print("Transfer response:", transfer_response)
+
+        # Burn the data token
+        print("Burning data token...")
+        burn_response = burn_data_on_gateway(file_hash)
+        print("Burn response:", burn_response)
+
+        # Query the transfer tracker
+        print("Querying transfer tracker...")
+        tracker_response = query_tracker_on_gateway(file_hash)
+        print("Tracker response:", tracker_response)
+
+        # Download the file back from the gateway
+        print("Downloading file from gateway...")
         download_from_gateway(file_hash)
+        print("Download process completed.")
