@@ -3,12 +3,10 @@ import os
 import json
 
 class EthereumMiddleware:
-    def __init__(self):
-        # Use the Ganache RPC URL
-        rpc_url = "http://127.0.0.1:8545"
+    def __init__(self, rpc_url, contract_address):
         self.web3 = Web3(Web3.HTTPProvider(rpc_url))
         if not self.web3.isConnected():
-            raise ConnectionError("Unable to connect to the Ethereum node at " + rpc_url)
+            raise ConnectionError("Unable to connect to the Ethereum node.")
 
         # Load contract details
         contract_address = os.getenv('CONTRACT_ADDRESS')
@@ -20,7 +18,7 @@ class EthereumMiddleware:
         with open('build/contracts/DataToken.json', 'r') as abi_file:
             contract_abi = json.load(abi_file)['abi']
 
-        self.contract = self.web3.eth.contract(address=self.contract_address, abi=contract_abi)
+        self.contract = self.web3.eth.contract(address=self.contract_address, abi=self.contract_abi)
 
     # Use this to handle sending transactions
     def send_transaction(self, function, account):
