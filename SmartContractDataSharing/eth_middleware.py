@@ -39,6 +39,8 @@ class EthereumMiddleware:
             raise ValueError(f"Invalid Base58 value: {data_hash}") from e
 
         # Ensure the decoded bytes are 32 bytes in length
+        print(f'data_hash_bytes: {data_hash_bytes}')
+        print(f'len(data_hash_bytes): {len(data_hash_bytes)}')
         if len(data_hash_bytes) != 32:
             # You may need to adjust this depending on your exact requirements
             raise ValueError("The decoded data hash must be exactly 32 bytes in length.")
