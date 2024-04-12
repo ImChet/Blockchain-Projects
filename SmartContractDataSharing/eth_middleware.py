@@ -12,7 +12,7 @@ class EthereumMiddleware:
         self.contract_address = Web3.toChecksumAddress(contract_address)
         
         # Load ABI
-        with open('path/to/your/contract/ABI/DataToken.json', 'r') as abi_file:
+        with open('build/contracts/DataToken.json', 'r') as abi_file:
             contract_abi = json.load(abi_file)['abi']
 
         self.contract = self.web3.eth.contract(address=self.contract_address, abi=contract_abi)
