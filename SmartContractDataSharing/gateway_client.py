@@ -1,4 +1,5 @@
 import requests
+from requests.utils import requote_uri
 
 # Uploads a file to the Flask server via HTTP POST
 def upload_to_gateway(file_path):
@@ -22,17 +23,26 @@ def upload_to_gateway(file_path):
             print(response.text)
         return None  # Return None in case of errors
 
-# Downloads a file from the Flask server using the file hash
 def download_from_gateway(file_hash):
     # Make a GET request to download the file by its hash
-    response = requests.get(f'http://localhost:8080/download/{file_hash}', stream=True)
+    response = requests.get(requote_uri(f'http://localhost:8080/download/{file_hash}'), stream=True)
     print(f'Response from download_from_gateway(): {response}')
+    
     if response.status_code == 200:
-        # Save the downloaded content to a file
-        with open(f'downloaded_{file_hash}', 'wb') as f:
+        # Extract the filename from the Content-Disposition header
+        content_disposition = response.headers.get('content-disposition')
+        filename = content_disposition.split("filename=")[-1].strip("\"'")
+        
+        # If no filename is found in the Content-Disposition header, use a default one
+        if not filename:
+            filename = f'downloaded_{file_hash}'
+        
+        # Save the downloaded content to a file with the extracted filename
+        with open(filename, 'wb') as f:
             for chunk in response.iter_content(chunk_size=1024):
-                f.write(chunk)  # Write in chunks to avoid loading the whole file into memory
-        print('Download successful')
+                if chunk:  # filter out keep-alive new chunks
+                    f.write(chunk)
+        print(f'Download successful, saved as {filename}')
     else:
         # Handle download errors
         print('Download failed')
