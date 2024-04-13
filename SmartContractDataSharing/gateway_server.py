@@ -58,6 +58,26 @@ def download_file_from_ipfs(file_hash):
     else:
         abort(404, 'File not found')
 
+def to_dict(dictToParse):
+    # convert any 'AttributeDict' type found to 'dict'
+    parsedDict = dict(dictToParse)
+    for key, val in parsedDict.items():
+        if isinstance(val, list):
+            parsedDict[key] = [parseValue(x) for x in val]
+        else:
+            parsedDict[key] = parseValue(val)
+    return parsedDict
+
+def parseValue(val):
+    # check for nested dict structures to iterate through
+    if 'dict' in str(type(val)).lower():
+        return to_dict(val)
+    # convert 'bytes' type to 'str'
+    elif 'bytes' in str(type(val)):
+        return val.hex()
+    else:
+        return val
+
 @app.route('/register', methods=['POST'])
 def register_data():
     data_hash = request.json.get('data_hash')
@@ -66,20 +86,10 @@ def register_data():
     size = request.json.get('size')
     account = request.json.get('account')
 
-    # print(f"Received data for registration - data_hash: {data_hash}, filename: {filename}, file_cid: {file_cid}, size: {size}, account: {account}")
-
     receipt = eth_middleware.register_data(data_hash, filename, file_cid, size, account)
     if receipt:
-        # Attempt to decode bytes to string, handle non-text data properly
-        receipt_dict = {}
-        for k, v in receipt.items():
-            if isinstance(v, bytes):
-                try:
-                    receipt_dict[k] = v.decode('utf-8')  # Attempt to decode as UTF-8
-                except UnicodeDecodeError:
-                    receipt_dict[k] = v.hex()  # Use hexadecimal representation for non-text data
-            else:
-                receipt_dict[k] = v
+        # Use the new to_dict function to handle complex nested data structures
+        receipt_dict = to_dict(receipt)
         return jsonify({'status': 'success', 'receipt': receipt_dict}), 200
     else:
         print("Failed to register data.")
