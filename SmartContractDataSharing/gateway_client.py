@@ -7,6 +7,7 @@ import hashlib
 web3 = Web3(Web3.HTTPProvider("http://localhost:8545"))
 accounts = web3.eth.accounts
 default_account = accounts[0]
+transfer_account = accounts[1]
 print(f"Using the first account from Ganache: {default_account}")
 
 def handle_response(response):
@@ -124,7 +125,7 @@ if __name__ == "__main__":
         # query_token(file_hash)
         register_response = register_data(file_hash, uploaded_file['filename'], uploaded_file['public'], int(uploaded_file.get('size', 0)), default_account)
         if register_response:
-            transfer_response = transfer_data(file_hash, '0xRecipientAddress')
+            transfer_response = transfer_data(file_hash, f'0x{transfer_account}')
             if transfer_response:
                 burn_response = burn_data(file_hash)
                 if burn_response:
