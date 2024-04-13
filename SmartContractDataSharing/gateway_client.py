@@ -116,7 +116,7 @@ if __name__ == "__main__":
     print("Client script started.")
     print("Using account:", default_account)
     
-    uploaded_file = upload_to_gateway('./practical/file.txt')
+    uploaded_file = upload_to_gateway('/practical/file.txt')
     if uploaded_file:
         file_hash = '0x' + uploaded_file['hash']
         # Convert the file_hash string to bytes using UTF-8 encoding
