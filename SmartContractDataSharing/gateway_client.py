@@ -100,9 +100,9 @@ def query_tracker(data_hash):
     return response.json() if response.ok else None
 
 def query_token(data_hash):
-    print(f"Querying token for data token with hash {data_hash}...")
+    print(f"Querying token info for data token with hash {data_hash}...")
     response = requests.get(f'http://localhost:8080/query?data_hash={data_hash}')
-    print("Token response:", response.text)
+    print("Query token response:", response.text)
     return response.json() if response.ok else None
 
 # # Example usage
@@ -225,14 +225,18 @@ if __name__ == "__main__":
             if transfer_response:
                 # Update the default account to the new owner after a successful transfer
                 default_account = new_owner
-                print("Transfer successful.")
+                print("Transfer successful. The new owner is:", default_account)
             else:
                 print("Transfer failed.")
         
         elif user_choice == '3' and file_hex_hash_str:
-            burn_response = burn_data_token(file_hex_hash_str, default_account)
-            if burn_response:
-                print("Burn response:", burn_response)
+            current_token_info = query_token(file_hex_hash_str)
+            if current_token_info and current_token_info['owner'] == default_account:
+                burn_response = burn_data_token(file_hex_hash_str, default_account)
+                if burn_response:
+                    print("Burn response:", burn_response)
+            else:
+                print("You are not the current owner of the token, so you cannot burn it.")
         
         elif user_choice == '4' and file_hex_hash_str:
             tracker_response = query_data_tracker(file_hex_hash_str)
