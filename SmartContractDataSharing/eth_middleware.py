@@ -22,7 +22,7 @@ class EthereumMiddleware:
 
     def register_data(self, data_hash, filename, file_cid, size, account):
         try:
-            print(f"Registering data - data_hash: {data_hash}, filename: {filename}, file_cid: {file_cid}, size: {size}, account: {account}")
+            # print(f"Registering data - data_hash: {data_hash}, filename: {filename}, file_cid: {file_cid}, size: {size}, account: {account}")
 
             # Convert data_hash to bytes32
             # data_hash_bytes = self.web3.to_bytes(hexstr=data_hash)
@@ -36,11 +36,11 @@ class EthereumMiddleware:
 
             # print(f"data_hash_bytes type: {type(data_hash_bytes)}")
             # print(data_hash_bytes)
-            print(f"filename_str type: {type(filename_str)}")
-            print(f"file_cid_str type: {type(file_cid_str)}")
-            print(f"size_int type: {type(size_int)}")
+            # print(f"filename_str type: {type(filename_str)}")
+            # print(f"file_cid_str type: {type(file_cid_str)}")
+            # print(f"size_int type: {type(size_int)}")
 
-            print("Calling register function on the contract.")
+            # print("Calling register function on the contract.")
             # Call the register function with the correct types
             tx_hash = self.contract.functions.register(
                 data_hash, filename_str, file_cid_str, size_int
@@ -48,7 +48,7 @@ class EthereumMiddleware:
 
             # Wait for transaction receipt
             receipt = self.web3.eth.wait_for_transaction_receipt(tx_hash)
-            print("Registration transaction receipt:", receipt)
+            # print("Registration transaction receipt:", receipt)
             return receipt
         except ValueError as e:
             print(f"Error registering data: {str(e)}")
