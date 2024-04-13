@@ -127,11 +127,11 @@ def query_token(data_hash):
 
 def main_menu():
     print("\nChoose an action:")
-    print("1: Upload and Register Data")
+    print("1: Register File")
     print("2: Transfer Data Token")
     print("3: Burn Data Token")
     print("4: Query Data Transfer Tracker")
-    print("5: Download Data")
+    print("5: Download File")
     print("0: Exit")
     return input("Enter the number of the action you want to perform: ")
 
@@ -147,21 +147,44 @@ def get_account_selection(accounts):
         print("Invalid selection. Please try again.")
         return get_account_selection(accounts)
 
-def transfer_data_token(file_hex_hash_str, from_account):
-    global to_account 
+def transfer_data_token(file_hex_hash_str, current_owner):
     to_account = get_account_selection(accounts)  # Let the user pick an account
-    print(f"Transferring data token with hash {file_hex_hash_str} from {from_account} to {to_account}...")
-    data = {
-        'data_hash': file_hex_hash_str,
-        'from_address': from_account,
-        'to_address': to_account
-    }
-    response = requests.post('http://localhost:8080/transfer', json=data)
-    print("Transfer response:", response.text)
-    return response.json() if response.ok else None
+    # Query the current owner of the token from the smart contract
+    token_info = query_token(file_hex_hash_str)
+    if token_info and token_info['owner'] == current_owner:
+        print(f"Transferring data token with hash {file_hex_hash_str} from {current_owner} to {to_account}...")
+        data = {
+            'data_hash': file_hex_hash_str,
+            'from_address': current_owner,
+            'to_address': to_account
+        }
+        response = requests.post('http://localhost:8080/transfer', json=data)
+        print("Transfer response:", response.text)
+        if response.ok:
+            # If transfer is successful, update the current owner
+            return response.json(), to_account
+        else:
+            return None, current_owner
+    else:
+        print("Transfer failed: You are not the owner of this token.")
+        return None, current_owner
 
-def burn_data_token(file_hex_hash_str):
-    return burn_data(file_hex_hash_str, to_account)
+def burn_data_token(file_hex_hash_str, current_owner):
+    # Query the current owner of the token from the smart contract
+    token_info = query_token(file_hex_hash_str)
+    if token_info and token_info['owner'] == current_owner:
+        print(f"Burning data token with hash {file_hex_hash_str}...")
+        data = {
+            'data_hash': file_hex_hash_str,
+            'from_address': current_owner
+        }
+        response = requests.post('http://localhost:8080/burn', json=data)
+        print("Burn response:", response.text)
+        return response.json() if response.ok else None
+    else:
+        print("Burn failed: You are not the owner of this token.")
+        return None
+
 
 def query_data_tracker(file_hex_hash_str):
     return query_tracker(file_hex_hash_str)
@@ -198,10 +221,13 @@ if __name__ == "__main__":
                 print("Failed to register data.")
         
         elif user_choice == '2' and file_hex_hash_str:
-            transfer_account = get_account_selection(accounts)  # Get the account to transfer to
-            transfer_response = transfer_data_token(file_hex_hash_str, default_account, transfer_account)
+            transfer_response, new_owner = transfer_data_token(file_hex_hash_str, default_account)
             if transfer_response:
-                print("Transfer response:", transfer_response)
+                # Update the default account to the new owner after a successful transfer
+                default_account = new_owner
+                print("Transfer successful.")
+            else:
+                print("Transfer failed.")
         
         elif user_choice == '3' and file_hex_hash_str:
             burn_response = burn_data_token(file_hex_hash_str, default_account)
