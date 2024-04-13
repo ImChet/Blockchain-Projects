@@ -135,6 +135,7 @@ def query_token(data_hash):
 # Example usage
 if __name__ == "__main__":
     print("Client script started.")
+    print(f'For testing purposes:\nYour address is: {default_account}\nThe account you will transfer to is: {transfer_account}')
     # Prompt the user for an absolute file path
     file_path = input("Please enter the absolute path of the file you want to upload: ")
     uploaded_file = upload_to_gateway(file_path)
