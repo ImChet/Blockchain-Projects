@@ -1,13 +1,32 @@
 import requests
 from requests.utils import requote_uri
 from web3 import Web3
-from gateway_server import to_dict
 
 # Connect to Ganache and get accounts
 web3 = Web3(Web3.HTTPProvider("http://localhost:8545"))
 accounts = web3.eth.accounts
 default_account = accounts[0]
 transfer_account = accounts[1]
+
+def to_dict(dictToParse):
+    # convert any 'AttributeDict' type found to 'dict'
+    parsedDict = dict(dictToParse)
+    for key, val in parsedDict.items():
+        if isinstance(val, list):
+            parsedDict[key] = [parseValue(x) for x in val]
+        else:
+            parsedDict[key] = parseValue(val)
+    return parsedDict
+
+def parseValue(val):
+    # check for nested dict structures to iterate through
+    if 'dict' in str(type(val)).lower():
+        return to_dict(val)
+    # convert 'bytes' type to 'str'
+    elif 'bytes' in str(type(val)):
+        return val.hex()
+    else:
+        return val
 
 def handle_response(response):
     if response.status_code == 200:
