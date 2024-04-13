@@ -66,12 +66,14 @@ def register_data():
     size = request.json.get('size')
     account = request.json.get('account')
 
-    print(f"Received data for registration - data_hash: {data_hash}, filename: {filename}, file_cid: {file_cid}, size: {size}, account: {account}")
+    # print(f"Received data for registration - data_hash: {data_hash}, filename: {filename}, file_cid: {file_cid}, size: {size}, account: {account}")
 
     receipt = eth_middleware.register_data(data_hash, filename, file_cid, size, account)
     if receipt:
         print(f"Registration successful - receipt: {receipt}")
-        return jsonify({'status': 'success', 'receipt': receipt}), 200
+        # Convert the AttributeDict to a regular dict
+        receipt_dict = dict(receipt)
+        return jsonify({'status': 'success', 'receipt': receipt_dict}), 200
     else:
         print("Failed to register data.")
         return jsonify({'status': 'error', 'message': 'Failed to register data.'}), 400

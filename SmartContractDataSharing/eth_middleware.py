@@ -13,7 +13,7 @@ class EthereumMiddleware:
         # Load the ABI from the contract JSON file
         with open('build/contracts/DataToken.json', 'r') as abi_file:
             self.contract_abi = json.load(abi_file)['abi']
-            print("Contract ABI:", self.contract_abi)  # Add this line to print the contract ABI
+            # print("Contract ABI:", self.contract_abi)  # Add this line to print the contract ABI
         
         self.contract = self.web3.eth.contract(
             address=self.contract_address, 
