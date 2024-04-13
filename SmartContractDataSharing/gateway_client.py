@@ -8,33 +8,6 @@ accounts = web3.eth.accounts
 default_account = accounts[0]
 transfer_account = accounts[1]
 
-def to_dict(obj):
-    if isinstance(obj, dict):
-        # Recursively apply to_dict to each item.
-        return {k: to_dict(v) for k, v in obj.items()}
-    elif isinstance(obj, list):
-        # Apply to_dict to each element in the list.
-        return [to_dict(elem) for elem in obj]
-    elif isinstance(obj, web3.datastructures.AttributeDict):
-        # Convert AttributeDict to dict and then apply to_dict.
-        return to_dict(dict(obj))
-    elif isinstance(obj, bytes):
-        # Convert bytes to hex representation.
-        return obj.hex()
-    else:
-        # No conversion possible, return the object as is.
-        return obj
-
-def parseValue(val):
-    # check for nested dict structures to iterate through
-    if 'dict' in str(type(val)).lower():
-        return to_dict(val)
-    # convert 'bytes' type to 'str'
-    elif 'bytes' in str(type(val)):
-        return val.hex()
-    else:
-        return val
-
 def handle_response(response):
     if response.status_code == 200:
         return response.json()  # Assuming response is in JSON format
@@ -100,7 +73,7 @@ def register_data(data_hash, filename, file_cid, size, account):
     return handle_response(response)
 
 def transfer_data(data_hash, to_address):
-    print(f"Transferring data token with hash {data_hash}...")
+    print(f"Transferring data token with hash {data_hash} to the account specified at transfer_account: {transfer_account}...")
     data = {
         'data_hash': data_hash,
         'from_address': default_account,
@@ -111,7 +84,7 @@ def transfer_data(data_hash, to_address):
     return response.json() if response.ok else None
 
 def burn_data(data_hash, from_account):
-    print(f"Burning data token with hash {data_hash}...")
+    print(f"For testing, assume the account at \"{transfer_account}\" initiated a burning of data token with hash {data_hash}...")
     data = {
         'data_hash': data_hash,
         'from_address': from_account
