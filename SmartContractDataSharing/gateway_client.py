@@ -1,6 +1,7 @@
 import requests
 from requests.utils import requote_uri
 from web3 import Web3
+from gateway_server import to_dict
 
 # Connect to Ganache and get accounts
 web3 = Web3(Web3.HTTPProvider("http://localhost:8545"))
@@ -99,11 +100,27 @@ def query_tracker(data_hash):
     print("Tracker response:", response.text)
     return response.json() if response.ok else None
 
+# def query_token(data_hash):
+#     print(f"Querying token info for data token with hash {data_hash}...")
+#     response = requests.get(f'http://localhost:8080/query?data_hash={data_hash}')
+#     print("Query token response:", response.text)
+#     return response.json() if response.ok else None
+
 def query_token(data_hash):
     print(f"Querying token info for data token with hash {data_hash}...")
     response = requests.get(f'http://localhost:8080/query?data_hash={data_hash}')
-    print("Query token response:", response.text)
-    return response.json() if response.ok else None
+    if response.status_code == 200:
+        try:
+            # Parse the JSON response and then convert to dict if needed
+            response_data = response.json()
+            token_info = to_dict(response_data)
+            print("Token info retrieved:", token_info)
+            return token_info
+        except ValueError as e:
+            print("Failed to parse token info:", e)
+    else:
+        print("Failed to query token info:", response.text)
+    return None
 
 # # Example usage
 # if __name__ == "__main__":
