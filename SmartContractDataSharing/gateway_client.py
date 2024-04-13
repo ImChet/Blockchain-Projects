@@ -8,15 +8,22 @@ accounts = web3.eth.accounts
 default_account = accounts[0]
 transfer_account = accounts[1]
 
-def to_dict(dictToParse):
-    # convert any 'AttributeDict' type found to 'dict'
-    parsedDict = dict(dictToParse)
-    for key, val in parsedDict.items():
-        if isinstance(val, list):
-            parsedDict[key] = [parseValue(x) for x in val]
-        else:
-            parsedDict[key] = parseValue(val)
-    return parsedDict
+def to_dict(obj):
+    if isinstance(obj, dict):
+        # Recursively apply to_dict to each item.
+        return {k: to_dict(v) for k, v in obj.items()}
+    elif isinstance(obj, list):
+        # Apply to_dict to each element in the list.
+        return [to_dict(elem) for elem in obj]
+    elif isinstance(obj, web3.datastructures.AttributeDict):
+        # Convert AttributeDict to dict and then apply to_dict.
+        return to_dict(dict(obj))
+    elif isinstance(obj, bytes):
+        # Convert bytes to hex representation.
+        return obj.hex()
+    else:
+        # No conversion possible, return the object as is.
+        return obj
 
 def parseValue(val):
     # check for nested dict structures to iterate through
