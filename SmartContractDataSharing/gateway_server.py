@@ -4,11 +4,10 @@ from ipfs_middleware import IPFSMiddleware
 from eth_middleware import EthereumMiddleware
 import os
 import hashlib
-import json
 from web3.exceptions import ContractLogicError
 
 app = Flask(__name__)
-ipfs_middleware = IPFSMiddleware('http://localhost:5001')  # Initialize middleware with IPFS API URL
+ipfs_middleware = IPFSMiddleware('http://localhost:5001')
 app = Flask(__name__)
 eth_middleware = EthereumMiddleware('http://localhost:8545', os.getenv('CONTRACT_ADDRESS'))
 
@@ -17,7 +16,6 @@ file_mapping = {}
 
 # Helper function to generate hash of file metadata
 def generate_metadata_hash(metadata):
-    # Prepare the data for hashing
     data_string = f"{metadata['Size']}{metadata['Name']}{metadata['Hash']}"
     return hashlib.sha256(data_string.encode()).hexdigest()
 
@@ -30,19 +28,17 @@ def upload_file_to_ipfs():
     if file.filename == '':
         abort(400, 'No selected file')
     filename = secure_filename(file.filename)
-    response = ipfs_middleware.upload_file(file)  # Upload the file via middleware
+    response = ipfs_middleware.upload_file(file)
 
-    # Store the mapping of the file hash to the original filename
     file_mapping[response['Hash']] = filename
 
-    # Create a receipt with the required information
     receipt = {
         'size': response['Size'],
         'filename': filename,
         'public': response['Hash'],
         'hash': generate_metadata_hash(response)
     }
-    return jsonify(receipt), 200  # Return the receipt as JSON
+    return jsonify(receipt), 200
 
 # Endpoint to handle file downloads
 @app.route('/download/<string:file_hash>', methods=['GET'])
@@ -89,7 +85,6 @@ def register_data():
 
     receipt = eth_middleware.register_data(data_hash, filename, file_cid, size, account)
     if receipt:
-        # Use the new to_dict function to handle complex nested data structures
         receipt_dict = to_dict(receipt)
         return jsonify({'status': 'success', 'receipt': receipt_dict}), 200
     else:
@@ -119,7 +114,6 @@ def burn_data():
         receipt = eth_middleware.burn_data(data_hash, from_address)
         return jsonify(to_dict(receipt)), 200
     except ContractLogicError as e:
-        # Here you can parse the error message and return a custom response
         error_message = str(e)
         print(f"Contract logic error: {error_message}")
         return jsonify({'status': 'error', 'message': error_message}), 500

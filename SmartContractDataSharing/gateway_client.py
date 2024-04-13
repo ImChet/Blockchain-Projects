@@ -1,14 +1,12 @@
 import requests
 from requests.utils import requote_uri
 from web3 import Web3
-import hashlib
 
 # Connect to Ganache and get accounts
 web3 = Web3(Web3.HTTPProvider("http://localhost:8545"))
 accounts = web3.eth.accounts
 default_account = accounts[0]
 transfer_account = accounts[1]
-print(f"Using the first account from Ganache: {default_account}")
 
 def handle_response(response):
     if response.status_code == 200:
@@ -19,25 +17,21 @@ def handle_response(response):
 
 # Uploads a file to the Flask server via HTTP POST
 def upload_to_gateway(file_path):
-    # Open the file in binary read mode
     with open(file_path, 'rb') as f:
-        files = {'file': f}  # Prepare the file for the request
+        files = {'file': f}
         # Send the file to the server's upload endpoint
         response = requests.post('http://localhost:8080/upload', files=files)
-        print("Raw response content:", response.text)  # Debugging: print raw response content
+        print("Raw response content:", response.text)
 
-        # Check if the request was successful
         if response.status_code == 200:
             try:
-                return response.json()  # Return the JSON response if available
+                return response.json()
             except ValueError as e:
-                # Handle cases where the response is not valid JSON
                 print('The response is not valid JSON:', e)
         else:
-            # Handle error responses
             print(f'Error {response.status_code}:')
             print(response.text)
-        return None  # Return None in case of errors
+        return None
 
 def download_from_gateway(file_hash):
     # Make a GET request to download the file by its hash
@@ -55,11 +49,10 @@ def download_from_gateway(file_hash):
         # Save the downloaded content to a file with the extracted filename
         with open(filename, 'wb') as f:
             for chunk in response.iter_content(chunk_size=1024):
-                if chunk:  # filter out keep-alive new chunks
+                if chunk:
                     f.write(chunk)
         print(f'Download successful, saved as {filename}')
     else:
-        # Handle download errors
         print('Download failed')
 
 def register_data(data_hash, filename, file_cid, size, account):
@@ -115,9 +108,9 @@ def query_token(data_hash):
 # Example usage
 if __name__ == "__main__":
     print("Client script started.")
-    print("Using account:", default_account)
-    
-    uploaded_file = upload_to_gateway('/practical/file.txt')
+    # Prompt the user for an absolute file path
+    file_path = input("Please enter the absolute path of the file you want to upload: ")
+    uploaded_file = upload_to_gateway(file_path)
     if uploaded_file:
         file_cid = uploaded_file['public']
         file_hex_hash_str = '0x' + uploaded_file['hash']

@@ -16,7 +16,7 @@ echo "Compiling and migrating contracts..."
 cd $PROJECT_ROOT
 truffle compile --all && truffle migrate --reset
 
-# Extract the deployed contract address (Ensure only the last address is captured)
+# Extract the deployed contract address
 CONTRACT_ADDRESS=$(grep -oE '0x[a-fA-F0-9]{40}' build/contracts/DataToken.json | tail -2 | head -1)
 echo "DataToken contract deployed at $CONTRACT_ADDRESS"
 

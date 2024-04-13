@@ -1,5 +1,4 @@
 from web3 import Web3
-import os
 import json
 
 class EthereumMiddleware:
@@ -35,7 +34,6 @@ class EthereumMiddleware:
 
             # Wait for transaction receipt
             receipt = self.web3.eth.wait_for_transaction_receipt(tx_hash)
-            # print("Registration transaction receipt:", receipt)
             return receipt
         except ValueError as e:
             print(f"Error registering data: {str(e)}")
