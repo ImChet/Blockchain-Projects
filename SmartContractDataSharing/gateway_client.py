@@ -90,11 +90,11 @@ def transfer_data(data_hash, to_address):
     print("Transfer response:", response.text)
     return response.json() if response.ok else None
 
-def burn_data(data_hash):
+def burn_data(data_hash, from_account):
     print(f"Burning data token with hash {data_hash}...")
     data = {
         'data_hash': data_hash,
-        'from_address': default_account
+        'from_address': from_account
     }
     response = requests.post('http://localhost:8080/burn', json=data)
     print("Burn response:", response.text)
@@ -127,7 +127,7 @@ if __name__ == "__main__":
         if register_response:
             transfer_response = transfer_data(file_hash, transfer_account)
             if transfer_response:
-                burn_response = burn_data(file_hash)
+                burn_response = burn_data(file_hash, transfer_account)
                 if burn_response:
                     tracker_response = query_tracker(file_hash)
                     if tracker_response:

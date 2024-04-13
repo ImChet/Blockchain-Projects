@@ -13,7 +13,6 @@ class EthereumMiddleware:
         # Load the ABI from the contract JSON file
         with open('build/contracts/DataToken.json', 'r') as abi_file:
             self.contract_abi = json.load(abi_file)['abi']
-            # print("Contract ABI:", self.contract_abi)  # Add this line to print the contract ABI
         
         self.contract = self.web3.eth.contract(
             address=self.contract_address, 
@@ -22,11 +21,6 @@ class EthereumMiddleware:
 
     def register_data(self, data_hash, filename, file_cid, size, account):
         try:
-            # print(f"Registering data - data_hash: {data_hash}, filename: {filename}, file_cid: {file_cid}, size: {size}, account: {account}")
-
-            # Convert data_hash to bytes32
-            # data_hash_bytes = self.web3.to_bytes(hexstr=data_hash)
-
             # Convert filename and file_cid to string
             filename_str = str(filename)
             file_cid_str = str(file_cid)
@@ -34,13 +28,6 @@ class EthereumMiddleware:
             # Ensure size is an integer
             size_int = int(size)
 
-            # print(f"data_hash_bytes type: {type(data_hash_bytes)}")
-            # print(data_hash_bytes)
-            # print(f"filename_str type: {type(filename_str)}")
-            # print(f"file_cid_str type: {type(file_cid_str)}")
-            # print(f"size_int type: {type(size_int)}")
-
-            # print("Calling register function on the contract.")
             # Call the register function with the correct types
             tx_hash = self.contract.functions.register(
                 data_hash, filename_str, file_cid_str, size_int
