@@ -100,7 +100,7 @@ def register_data():
 def query_data():
     data_hash = request.args.get('data_hash')
     data_info = eth_middleware.query_data(data_hash)
-    return jsonify(data_info), 200
+    return jsonify(to_dict(data_info)), 200
 
 @app.route('/transfer', methods=['POST'])
 def transfer_data():
@@ -117,7 +117,7 @@ def burn_data():
         data_hash = request.json.get('data_hash')
         from_address = request.json.get('from_address')
         receipt = eth_middleware.burn_data(data_hash, from_address)
-        return jsonify(receipt), 200
+        return jsonify(to_dict(receipt)), 200
     except ContractLogicError as e:
         # Here you can parse the error message and return a custom response
         error_message = str(e)
