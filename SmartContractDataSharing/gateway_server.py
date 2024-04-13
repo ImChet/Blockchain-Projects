@@ -128,7 +128,7 @@ def burn_data():
 def query_tracker():
     data_hash = request.args.get('data_hash')
     transfer_log = eth_middleware.query_tracker(data_hash)
-    return jsonify(to_dict(transfer_log)), 200
+    return jsonify(transfer_log), 200
 
 if __name__ == '__main__':
     app.run(debug=True, port=8080)
