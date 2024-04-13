@@ -5,6 +5,7 @@ from eth_middleware import EthereumMiddleware
 import os
 import hashlib
 import json
+from web3.exceptions import ContractLogicError
 
 app = Flask(__name__)
 ipfs_middleware = IPFSMiddleware('http://localhost:5001')  # Initialize middleware with IPFS API URL
@@ -112,10 +113,16 @@ def transfer_data():
 
 @app.route('/burn', methods=['POST'])
 def burn_data():
-    data_hash = request.json.get('data_hash')
-    from_address = request.json.get('from_address')
-    receipt = eth_middleware.burn_data(data_hash, from_address)
-    return jsonify(to_dict(receipt)), 200
+    try:
+        data_hash = request.json.get('data_hash')
+        from_address = request.json.get('from_address')
+        receipt = eth_middleware.burn_data(data_hash, from_address)
+        return jsonify(receipt), 200
+    except ContractLogicError as e:
+        # Here you can parse the error message and return a custom response
+        error_message = str(e)
+        print(f"Contract logic error: {error_message}")
+        return jsonify({'status': 'error', 'message': error_message}), 500
 
 @app.route('/tracker', methods=['GET'])
 def query_tracker():
