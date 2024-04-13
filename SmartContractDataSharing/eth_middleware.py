@@ -25,7 +25,7 @@ class EthereumMiddleware:
             print(f"Registering data - data_hash: {data_hash}, filename: {filename}, file_cid: {file_cid}, size: {size}, account: {account}")
 
             # Convert data_hash to bytes32
-            data_hash_bytes = self.web3.to_bytes(hexstr=data_hash)
+            # data_hash_bytes = self.web3.to_bytes(hexstr=data_hash)
 
             # Convert filename and file_cid to string
             filename_str = str(filename)
@@ -34,7 +34,8 @@ class EthereumMiddleware:
             # Ensure size is an integer
             size_int = int(size)
 
-            print(f"data_hash_bytes type: {type(data_hash_bytes)}")
+            # print(f"data_hash_bytes type: {type(data_hash_bytes)}")
+            # print(data_hash_bytes)
             print(f"filename_str type: {type(filename_str)}")
             print(f"file_cid_str type: {type(file_cid_str)}")
             print(f"size_int type: {type(size_int)}")
@@ -42,7 +43,7 @@ class EthereumMiddleware:
             print("Calling register function on the contract.")
             # Call the register function with the correct types
             tx_hash = self.contract.functions.register(
-                data_hash_bytes, filename_str, file_cid_str, size_int
+                data_hash, filename_str, file_cid_str, size_int
             ).transact({'from': account})
 
             # Wait for transaction receipt

@@ -1,6 +1,7 @@
 import requests
 from requests.utils import requote_uri
 from web3 import Web3
+import hashlib
 
 # Connect to Ganache and get accounts
 web3 = Web3(Web3.HTTPProvider("http://localhost:8545"))
@@ -68,7 +69,7 @@ def register_data(data_hash, filename, file_cid, size, account):
     print(f"Size: {size}")
     print(f"Account: {account}")
     data = {
-        'data_hash': data_hash.hex(),
+        'data_hash': data_hash,
         'filename': filename,
         'file_cid': file_cid,
         'size': size,
@@ -104,17 +105,24 @@ def query_tracker(data_hash):
     print("Tracker response:", response.text)
     return response.json() if response.ok else None
 
+def query_token(data_hash):
+    print(f"Querying token for data token with hash {data_hash}...")
+    response = requests.get(f'http://localhost:8080/query?data_hash={data_hash}')
+    print("Token response:", response.text)
+    return response.json() if response.ok else None
+
 # Example usage
 if __name__ == "__main__":
     print("Client script started.")
     print("Using account:", default_account)
     
-    uploaded_file = upload_to_gateway('/practical/file.txt')
+    uploaded_file = upload_to_gateway('./practical/file.txt')
     if uploaded_file:
-        file_hash = uploaded_file['public']
+        file_hash = '0x' + uploaded_file['hash']
         # Convert the file_hash string to bytes using UTF-8 encoding
         print(f"File hash: {file_hash}")
-        register_response = register_data(Web3.to_bytes(text=file_hash), uploaded_file['filename'], '', int(uploaded_file.get('size', 0)), default_account)
+        # query_token(file_hash)
+        register_response = register_data(file_hash, uploaded_file['filename'], uploaded_file['public'], int(uploaded_file.get('size', 0)), default_account)
         if register_response:
             transfer_response = transfer_data(file_hash, '0xRecipientAddress')
             if transfer_response:

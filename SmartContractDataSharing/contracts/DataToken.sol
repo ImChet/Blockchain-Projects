@@ -17,7 +17,7 @@ contract DataToken {
     event TokenTransferred(bytes32 indexed dataHash, address indexed from, address indexed to);
     event TokenBurned(bytes32 indexed dataHash);
 
-    function register(bytes32 dataHash, string calldata filename, string calldata fileCID, uint256 size) external {
+    function register(bytes32 dataHash, string memory filename, string memory fileCID, uint256 size) external {
         require(dataTokens[dataHash].owner == address(0), "Token already registered.");
         
         dataTokens[dataHash] = Data(msg.sender, filename, fileCID, size);
