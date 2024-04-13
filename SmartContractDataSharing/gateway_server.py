@@ -107,20 +107,21 @@ def transfer_data():
     from_address = request.json.get('from_address')
     to_address = request.json.get('to_address')
     receipt = eth_middleware.transfer_data(data_hash, from_address, to_address)
-    return jsonify(receipt), 200
+    
+    return jsonify(to_dict(receipt)), 200
 
 @app.route('/burn', methods=['POST'])
 def burn_data():
     data_hash = request.json.get('data_hash')
     from_address = request.json.get('from_address')
     receipt = eth_middleware.burn_data(data_hash, from_address)
-    return jsonify(receipt), 200
+    return jsonify(to_dict(receipt)), 200
 
 @app.route('/tracker', methods=['GET'])
 def query_tracker():
     data_hash = request.args.get('data_hash')
     transfer_log = eth_middleware.query_tracker(data_hash)
-    return jsonify(transfer_log), 200
+    return jsonify(to_dict(transfer_log)), 200
 
 if __name__ == '__main__':
     app.run(debug=True, port=8080)
