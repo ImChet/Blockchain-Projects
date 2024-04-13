@@ -140,8 +140,28 @@ def upload_register_data():
     file_path = input("Please enter the absolute path of the file you want to upload: ")
     return upload_to_gateway(file_path)
 
-def transfer_data_token(file_hex_hash_str):
-    return transfer_data(file_hex_hash_str, transfer_account)
+def get_account_selection(accounts):
+    print("\nAvailable accounts:")
+    for index, account in enumerate(accounts):
+        print(f"{index}: {account}")
+    selected_index = int(input("Select an account by entering the number next to it: "))
+    if 0 <= selected_index < len(accounts):
+        return accounts[selected_index]
+    else:
+        print("Invalid selection. Please try again.")
+        return get_account_selection(accounts)
+
+def transfer_data_token(file_hex_hash_str, from_account):
+    to_account = get_account_selection(accounts)  # Let the user pick an account
+    print(f"Transferring data token with hash {file_hex_hash_str} from {from_account} to {to_account}...")
+    data = {
+        'data_hash': file_hex_hash_str,
+        'from_address': from_account,
+        'to_address': to_account
+    }
+    response = requests.post('http://localhost:8080/transfer', json=data)
+    print("Transfer response:", response.text)
+    return response.json() if response.ok else None
 
 def burn_data_token(file_hex_hash_str):
     return burn_data(file_hex_hash_str, transfer_account)
@@ -175,7 +195,7 @@ if __name__ == "__main__":
                     print("Failed to register data.")
         
         elif user_choice == '2' and file_hex_hash_str:
-            transfer_response = transfer_data_token(file_hex_hash_str)
+            transfer_response = transfer_data_token(file_hex_hash_str, default_account)
             print("Transfer response:", transfer_response)
         
         elif user_choice == '3' and file_hex_hash_str:
