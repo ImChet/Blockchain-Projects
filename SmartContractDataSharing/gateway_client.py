@@ -1,6 +1,7 @@
 import requests
 from requests.utils import requote_uri
 from web3 import Web3
+import os
 
 # Connect to Ganache and get accounts
 web3 = Web3(Web3.HTTPProvider("http://localhost:8545"))
@@ -46,12 +47,18 @@ def download_from_gateway(file_hash):
         if not filename:
             filename = f'dl_{file_hash}'
         
+        # Define the path where the file will be saved
+        download_path = os.path.join(os.getcwd(), filename)
+        
         # Save the downloaded content to a file with the extracted filename
-        with open(filename, 'wb') as f:
+        with open(download_path, 'wb') as f:
             for chunk in response.iter_content(chunk_size=1024):
                 if chunk:
                     f.write(chunk)
-        print(f'Download successful, saved as {filename}')
+        
+        # Get the absolute path of the downloaded file
+        absolute_path = os.path.abspath(download_path)
+        print(f'Download successful, saved as {absolute_path}')
     else:
         print('Download failed')
 
