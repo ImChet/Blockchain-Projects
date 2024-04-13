@@ -105,22 +105,95 @@ def query_token(data_hash):
     print("Token response:", response.text)
     return response.json() if response.ok else None
 
+# # Example usage
+# if __name__ == "__main__":
+#     print("Client script started.")
+#     # Prompt the user for an absolute file path
+#     file_path = input("Please enter the absolute path of the file you want to upload: ")
+#     uploaded_file = upload_to_gateway(file_path)
+#     if uploaded_file:
+#         file_cid = uploaded_file['public']
+#         file_hex_hash_str = '0x' + uploaded_file['hash']
+#         register_response = register_data(file_hex_hash_str, uploaded_file['filename'], uploaded_file['public'], int(uploaded_file.get('size', 0)), default_account)
+#         if register_response:
+#             transfer_response = transfer_data(file_hex_hash_str, transfer_account)
+#             if transfer_response:
+#                 burn_response = burn_data(file_hex_hash_str, transfer_account)
+#                 if burn_response:
+#                     tracker_response = query_tracker(file_hex_hash_str)
+#                     if tracker_response:
+#                         download_from_gateway(file_cid)
+#     print("Client script finished.")
+
+def main_menu():
+    print("\nChoose an action:")
+    print("1: Upload and Register Data")
+    print("2: Transfer Data Token")
+    print("3: Burn Data Token")
+    print("4: Query Data Transfer Tracker")
+    print("5: Download Data")
+    print("0: Exit")
+    return input("Enter the number of the action you want to perform: ")
+
+# Define a function to execute each action
+def upload_register_data():
+    file_path = input("Please enter the absolute path of the file you want to upload: ")
+    return upload_to_gateway(file_path)
+
+def transfer_data_token(file_hex_hash_str):
+    return transfer_data(file_hex_hash_str, transfer_account)
+
+def burn_data_token(file_hex_hash_str):
+    return burn_data(file_hex_hash_str, transfer_account)
+
+def query_data_tracker(file_hex_hash_str):
+    return query_tracker(file_hex_hash_str)
+
+def download_data(file_cid):
+    download_from_gateway(file_cid)
+
 # Example usage
 if __name__ == "__main__":
     print("Client script started.")
-    # Prompt the user for an absolute file path
-    file_path = input("Please enter the absolute path of the file you want to upload: ")
-    uploaded_file = upload_to_gateway(file_path)
-    if uploaded_file:
-        file_cid = uploaded_file['public']
-        file_hex_hash_str = '0x' + uploaded_file['hash']
-        register_response = register_data(file_hex_hash_str, uploaded_file['filename'], uploaded_file['public'], int(uploaded_file.get('size', 0)), default_account)
-        if register_response:
-            transfer_response = transfer_data(file_hex_hash_str, transfer_account)
-            if transfer_response:
-                burn_response = burn_data(file_hex_hash_str, transfer_account)
-                if burn_response:
-                    tracker_response = query_tracker(file_hex_hash_str)
-                    if tracker_response:
-                        download_from_gateway(file_cid)
+    user_choice = ''
+    file_hex_hash_str = None
+    file_cid = None
+
+    while user_choice != '0':
+        user_choice = main_menu()
+        
+        if user_choice == '1':
+            uploaded_file = upload_register_data()
+            if uploaded_file:
+                file_cid = uploaded_file['public']
+                file_hex_hash_str = '0x' + uploaded_file['hash']
+                print("File uploaded successfully.")
+                register_response = register_data(file_hex_hash_str, uploaded_file['filename'], uploaded_file['public'], int(uploaded_file.get('size', 0)), default_account)
+                if register_response:
+                    print("Data registered on the blockchain.")
+                else:
+                    print("Failed to register data.")
+        
+        elif user_choice == '2' and file_hex_hash_str:
+            transfer_response = transfer_data_token(file_hex_hash_str)
+            print("Transfer response:", transfer_response)
+        
+        elif user_choice == '3' and file_hex_hash_str:
+            burn_response = burn_data_token(file_hex_hash_str)
+            print("Burn response:", burn_response)
+        
+        elif user_choice == '4' and file_hex_hash_str:
+            tracker_response = query_data_tracker(file_hex_hash_str)
+            print("Tracker response:", tracker_response)
+        
+        elif user_choice == '5' and file_cid:
+            download_data(file_cid)
+            print("Download complete.")
+        
+        elif user_choice == '0':
+            print("Exiting the script.")
+        
+        else:
+            print("Invalid choice or action not available without previous steps.")
+
     print("Client script finished.")
