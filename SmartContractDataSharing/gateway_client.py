@@ -119,17 +119,18 @@ if __name__ == "__main__":
     
     uploaded_file = upload_to_gateway('/practical/file.txt')
     if uploaded_file:
-        file_hash = '0x' + uploaded_file['hash']
+        file_hash = uploaded_file['hash']
+        file_hex_str = '0x' + uploaded_file['hash']
         # Convert the file_hash string to bytes using UTF-8 encoding
-        print(f"File hash: {file_hash}")
+        print(f"File hash: {file_hex_str}")
         # query_token(file_hash)
-        register_response = register_data(file_hash, uploaded_file['filename'], uploaded_file['public'], int(uploaded_file.get('size', 0)), default_account)
+        register_response = register_data(file_hex_str, uploaded_file['filename'], uploaded_file['public'], int(uploaded_file.get('size', 0)), default_account)
         if register_response:
-            transfer_response = transfer_data(file_hash, transfer_account)
+            transfer_response = transfer_data(file_hex_str, transfer_account)
             if transfer_response:
-                burn_response = burn_data(file_hash, transfer_account)
+                burn_response = burn_data(file_hex_str, transfer_account)
                 if burn_response:
-                    tracker_response = query_tracker(file_hash)
+                    tracker_response = query_tracker(file_hex_str)
                     if tracker_response:
                         download_from_gateway(file_hash)
     print("Client script finished.")
