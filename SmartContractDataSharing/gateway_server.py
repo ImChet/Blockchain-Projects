@@ -71,8 +71,8 @@ def register_data():
     receipt = eth_middleware.register_data(data_hash, filename, file_cid, size, account)
     if receipt:
         print(f"Registration successful - receipt: {receipt}")
-        # Convert the AttributeDict to a regular dict
-        receipt_dict = dict(receipt)
+        # Convert bytes to string if 'receipt' has any bytes object in it
+        receipt_dict = {k: v.decode() if isinstance(v, bytes) else v for k, v in receipt.items()}
         return jsonify({'status': 'success', 'receipt': receipt_dict}), 200
     else:
         print("Failed to register data.")
