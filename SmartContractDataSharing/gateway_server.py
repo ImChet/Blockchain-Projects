@@ -70,9 +70,16 @@ def register_data():
 
     receipt = eth_middleware.register_data(data_hash, filename, file_cid, size, account)
     if receipt:
-        # print(f"Registration successful - receipt: {receipt}")
-        # Convert bytes to string if 'receipt' has any bytes object in it
-        receipt_dict = {k: v.decode() if isinstance(v, bytes) else v for k, v in receipt.items()}
+        # Attempt to decode bytes to string, handle non-text data properly
+        receipt_dict = {}
+        for k, v in receipt.items():
+            if isinstance(v, bytes):
+                try:
+                    receipt_dict[k] = v.decode('utf-8')  # Attempt to decode as UTF-8
+                except UnicodeDecodeError:
+                    receipt_dict[k] = v.hex()  # Use hexadecimal representation for non-text data
+            else:
+                receipt_dict[k] = v
         return jsonify({'status': 'success', 'receipt': receipt_dict}), 200
     else:
         print("Failed to register data.")
